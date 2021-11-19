@@ -69,7 +69,7 @@ const LogIn =() => {
                     <TextField label="Email" type="email" inputRef={emailRef} required variant="outlined" fullWidth/>
                     <TextField label="Password" type="password" inputRef={passwordRef} required variant="outlined" fullWidth/>
                 </Grid>
-                <Link to="#" >forgot passowrd?</Link>
+                <Link to="/forgot-password" >forgot passowrd?</Link>
                 <Box m={2}>
                     <Button disabled={loading} type="submit" variant="contained" color="primary" fullWidth>Log In</Button>
                 </Box>

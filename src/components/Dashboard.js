@@ -3,11 +3,9 @@ import Header from './Header'
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 
 
-
-function Dashboard() {
+function Dashboard(){
     
     const { currentUser, logout } = useAuth();
-
 
     return (
         <div>

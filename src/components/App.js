@@ -1,7 +1,7 @@
 import React from 'react';
 import { AuthProvider } from '../contexts/AuthContext';
 import SignUp from './SignUp';
-import { BrowserRouter as Router, Routes , Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes , Route, Outlet } from 'react-router-dom'
 import { Container } from '@material-ui/core';
 import Dashboard from './Dashboard';
 import Login from './LogIn';
@@ -12,7 +12,15 @@ import EditUser from './EditUser';
 
 function App() {
   
-
+  function Messages () {
+    return (
+      <Container>
+        <Dashboard />
+        <EditUser />
+        <Outlet />
+      </Container>
+    )
+  }
   return (
     <AuthProvider>
     <Container>

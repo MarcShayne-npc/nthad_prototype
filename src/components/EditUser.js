@@ -47,24 +47,27 @@ export default function EditUser() {
             <strong>EMAIL: </strong> {currentUser.email}
             <Grid container columnSpacing={1} rowSpacing={1} direction="row" justifyContent="center" alignItems="center" marginBottom={1}>
                 <Grid item xs={11} sm={8} md={3}>
-                    <TextField label="User Display Name" variant="outlined" value={value.displayName} sx={{width: '100%'}} />
+                    <TextField label="User Display Name" type="text" variant="outlined" sx={{width: '100%'}} />
                 </Grid>
                 <Grid item xs={11} sm={8} md={3}>
-                    <TextField label="Stage Name*" variant="outlined" value={value.lastName} sx={{width: '100%'}}/>
+                    <TextField label="Stage Name*" type="text" variant="outlined" value={value.lastName} sx={{width: '100%'}}/>
                 </Grid>
             </Grid>
 
             <Grid container columnSpacing={1} rowSpacing={1} direction="row" justifyContent="center" alignItems="center" marginBottom={1} > 
                 <Grid item xs={11} sm={8} md={3}>
-                    <TextField label="First Name*" variant="outlined" value={value.firstName} sx={{width: '100%'}} />
+                    <TextField label="First Name*" type="text" variant="outlined" value={value.firstName} sx={{width: '100%'}} />
                 </Grid>
                 <Grid item xs={11} sm={8} md={3}>
-                    <TextField label="Last Name*" variant="outlined" value={value.lastName} sx={{width: '100%'}}/>
+                    <TextField label="Last Name*" type="text" variant="outlined" value={value.lastName} sx={{width: '100%'}}/>
                 </Grid>
             </Grid>
 
-            <Grid container columnSpacing={5} rowSpacing={5} direction="row" justifyContent="center" alignItems="center" marginBottom={1} > 
-                <Grid item xs={11} sm={8} md={6} textAlign="center">
+            <Grid container columnSpacing={1} rowSpacing={1} direction="row" justifyContent="center" alignItems="center" marginBottom={1} >
+                <Grid item xs={11} sm={8} md={1} textAlign="center">
+                    <TextField label="Country Code" type=""variant="outlined" value={value.lastName} sx={{width: 1}}/>
+                </Grid>
+                <Grid item xs={11} sm={8} md={5} textAlign="center">
                     <TextField label="Place holder(Phone number)" variant="outlined" value={value.lastName} sx={{width: 1}}/>
                 </Grid>
             </Grid>

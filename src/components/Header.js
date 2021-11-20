@@ -14,13 +14,20 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { ListAlt, PermMedia, Settings, Logout, MenuBook } from '@mui/icons-material';
+import { ListAlt, PermMedia, Settings, Logout, MenuBook, Login } from '@mui/icons-material';
 import { useState } from 'react';
 import { Avatar } from '@material-ui/core';
 import { useAuth } from '../contexts/AuthContext';
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { Alert } from '@mui/material';
+import { onAuthStateChanged } from "firebase/auth"
+import { auth } from '../firebase';
+import firebase from '@firebase/app-compat';
+import { getAuth, setPersistence, signInWithEmailAndPassword, browserSessionPersistence } from "firebase/auth";
+
 
 const drawerWidth = 280;
+
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
@@ -69,13 +76,16 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 
 
+
+
 export default function Header() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [error , setError ] = useState();
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-
+  
+  
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -84,11 +94,15 @@ export default function Header() {
     setOpen(false);
   };
 
+  const handleSetting = () =>{
+    navigate("/edit-profile")
+  }
+
   async function hanedleLogout(){
     setError('')
 
     try{
-        await Logout()
+        await logout()
         navigate("/login")
     }catch{
       setError('Failed to log out')
@@ -132,20 +146,48 @@ export default function Header() {
         <Avatar alt="default" src="https://cvhrma.org/wp-content/uploads/2015/07/default-profile-photo.jpg"  style={{ height: '100px', width: '100px', alignSelf: 'center' }}/>
         <strong>EMAIL: </strong> {currentUser.email}
         <strong>UID: </strong> {currentUser.uid}
+        {error && <Alert severity="error">{error}</Alert>}
         <Divider />
         <List>
-          {['Product List', 'Gallery', 'Setting', 'Logout', 'Producer Pages'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index === 0 && <ListAlt />}
-                {index === 1 && <PermMedia />}
-                {index === 2 && <Settings />}
-                {index === 3 && <Logout onClick={hanedleLogout}/> }
-                {index === 4 && <MenuBook />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
+          <ListItem button>
+            <ListItemIcon>
+              <ListAlt />
+            </ListItemIcon>
+            <ListItemText primary={"Product List"} />
+          </ListItem>
+          <Divider/>
+
+          <ListItem button>
+            <ListItemIcon>
+              <PermMedia />
+            </ListItemIcon>
+            <ListItemText primary={"Gallery"} />
+          </ListItem>
+          <Divider/>
+          
+          <ListItem button>
+            <ListItemIcon>
+              <Settings />
+            </ListItemIcon>
+            <ListItemText primary={"Setting"} onClick={handleSetting} />
+          </ListItem>
+          <Divider/>
+
+          <ListItem button>
+            <ListItemIcon>
+              <Logout />
+            </ListItemIcon>
+            <ListItemText primary={"Logout"} onClick={hanedleLogout}/>
+          </ListItem>
+          <Divider/>
+
+          <ListItem button>
+            <ListItemIcon>
+              <MenuBook />
+            </ListItemIcon>
+            <ListItemText primary={"Producer Pages"} />
+          </ListItem>
+          <Divider/>
         </List>
       </Drawer>
       <Main open={open}>

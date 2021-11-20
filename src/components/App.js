@@ -7,23 +7,28 @@ import Dashboard from './Dashboard';
 import Login from './LogIn';
 import PrivateRoute from './PrivateRoute';
 import ForgotPassword from './ForgotPassword';
+import EditUser from './EditUser';
+
 
 function App() {
+  
+
   return (
+    <AuthProvider>
     <Container>
       <Router>
-        <AuthProvider>
           <Routes>
             <Route exact path="/" element={<PrivateRoute />}>
-              <Route exact path='/' element={<Dashboard />}/>
+              <Route path="/dashboard" element={<Dashboard />}/>
+              <Route exact path ="/edit-profile" element={<EditUser />} />
             </Route>
             <Route path="/signup" element={<SignUp />}/>
             <Route path="/login" element={<Login />}/>
             <Route path="/forgot-password" element={<ForgotPassword/>}/>
           </Routes>
-        </AuthProvider>
       </Router>
     </Container>
+        </AuthProvider>
   )}
 
 export default App;

@@ -3,8 +3,7 @@ import { useRef, useState } from 'react';
 import { Box, Card, Grid , TextField, Button } from '@material-ui/core';
 import { useAuth } from '../contexts/AuthContext'
 import Alert from '@mui/material/Alert';
-import { Link, useNavigate } from 'react-router-dom'
-import firebase from '@firebase/app-compat';
+import { Link } from 'react-router-dom'
 
 const ForgotPassword =() => {
 
@@ -17,8 +16,6 @@ const ForgotPassword =() => {
 
     //styling
     const cardStyle={padding:20,height:'450px',width:280,margin:"120px auto"}
-    const h2Style={width:'100%',align:'center',borderBottom:'1px solid #000',lineHeight: '0.1em',margin:'10px 0 20px' }
-    const spanStyle={background:'#fff',padding:'0 10px'}
 
     //handles login function
     async function handleSubmit(e){

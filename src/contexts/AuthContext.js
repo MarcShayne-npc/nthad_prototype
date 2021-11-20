@@ -31,12 +31,14 @@ export function AuthProvider({children}) {
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
+            setCurrentUser(user)
             setLoading(false)
-          setCurrentUser(user)
+          console.log("Logged in")
         })
     
         return unsubscribe
       }, [])
+      
 
     const value = {
         currentUser,

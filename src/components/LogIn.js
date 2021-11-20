@@ -29,9 +29,9 @@ const LogIn =() => {
             setError("")
             setLoading(true)
             await login(emailRef.current.value, passwordRef.current.value)
-            navigate("/");
+            navigate("/dashboard");
         } catch{
-            setError('Failed to sign in')
+            setError("The password or email that you've entered is incorrect.")
         }
         setLoading(false)
     }
@@ -58,6 +58,7 @@ const LogIn =() => {
             setError('Failed to sign in with Facebook')
         })
     }
+
     return (
         <Grid container>
         <Card elevation={10} align="center" variant="outlined" style={cardStyle}>
@@ -65,8 +66,10 @@ const LogIn =() => {
             <form onSubmit ={handleSubmit}>
                 <h1>Log In</h1>
                 Don't have an account? <Link to="/signup">Sign Up</Link>
-                <Grid item >
+                <Grid item>
                     <TextField label="Email" type="email" inputRef={emailRef} required variant="outlined" fullWidth/>
+                </Grid>
+                <Grid item>
                     <TextField label="Password" type="password" inputRef={passwordRef} required variant="outlined" fullWidth/>
                 </Grid>
                 <Link to="/forgot-password" >forgot passowrd?</Link>

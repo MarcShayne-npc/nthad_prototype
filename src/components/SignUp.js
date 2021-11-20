@@ -24,8 +24,11 @@ const SignUp =() => {
     async function handleSubmit(e){
         e.preventDefault()
         //check's if the both password are the same
-        if(passwordRef.current.value !== passwordConfirmRef.current.value){
+        if(passwordRef.current.value !== passwordConfirmRef.current.value ){
             return setError('Password do not match')
+        }
+        else if(passwordRef.current.value != 6){
+            return setError('Password needs to be 6 or more characters')
         }
         
         try{

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { Box, Card, Grid , TextField, Button } from '@material-ui/core';
 import { useAuth } from '../contexts/AuthContext'
 import Alert from '@mui/material/Alert';
@@ -11,7 +11,7 @@ const LogIn =() => {
     //references and state
     const emailRef =useRef()
     const passwordRef =useRef()
-    const { currentUser, login } = useAuth()
+    const { login } = useAuth()
     const [error, setError] =useState('')
     const [loading, setLoading] =useState(false)     
     const navigate = useNavigate()
@@ -67,7 +67,7 @@ const LogIn =() => {
             setError('Failed to sign in with Google')
         })
     }
-    
+
     //sign in with firebase facebook
     const SignInWithFirebaseFacebook=()=>{
         var facebook_Provide = new firebase.auth.FacebookAuthProvider();

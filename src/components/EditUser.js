@@ -26,11 +26,6 @@ export default function EditUser() {
     const [value, setValue] = useState(userInfo);
     const { currentUser } = useAuth();
 
-
-
-    
-    
-
     return (
         <form>
             <Header />

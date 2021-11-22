@@ -1,8 +1,7 @@
 import React from 'react'
 import {useContext, useState, useEffect} from 'react'
 import {auth, db } from '../firebase'
-import { collection, doc, getDocs } from '@firebase/firestore'
-import { Navigate } from 'react-router'
+
 
 const AuthContext = React.createContext()
 
@@ -39,8 +38,7 @@ export function AuthProvider({children}) {
     function resetPassword(email){
         return auth.sendPasswordResetEmail(email)
     }
-    const userCollectionRef = collection(db, "user")
-    const [userDocs, setUserDocs ] = useState([])
+
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {

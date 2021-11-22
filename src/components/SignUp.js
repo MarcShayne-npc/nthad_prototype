@@ -6,6 +6,7 @@ import Alert from '@mui/material/Alert';
 import { Link, useNavigate } from 'react-router-dom'
 import firebase from '@firebase/app-compat';
 const SignUp =() => {
+    
     //references and state
     const emailRef =useRef()
     const passwordRef =useRef()
@@ -14,7 +15,7 @@ const SignUp =() => {
     const [error, setError] =useState('')
     const [loading, setLoading] =useState(false)
     const navigate = useNavigate();
-    const { currentUser } = useAuth()
+
     //styling
     const cardStyle={padding:20,height:'450px',width:280,margin:"120px auto"}
     const h2Style={width:'100%',align:'center',borderBottom:'1px solid #000',lineHeight: '0.1em',margin:'10px 0 20px' }

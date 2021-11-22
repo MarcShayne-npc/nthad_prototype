@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Grid, TextField, Avatar } from '@mui/material'
 import Header from './Header';
 import { useAuth } from '../contexts/AuthContext'
-import { useNavigate } from 'react-router';
 
 const userInfo ={
     uid:'',
@@ -24,9 +23,9 @@ const userInfo ={
 
 export default function EditUser() {
 
-    const [value,setValue] = useState(userInfo);
+    const [value, setValue] = useState(userInfo);
     const { currentUser } = useAuth();
-    const navigate = useNavigate();
+
 
 
     

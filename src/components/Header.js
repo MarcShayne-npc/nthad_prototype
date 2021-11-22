@@ -23,6 +23,7 @@ import { Alert } from '@mui/material';
 import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
 import { MenuItem,  Button, Menu } from '@mui/material';
+import MailIcon from '@mui/icons-material/Mail';
 
 const drawerWidth = 280;
 
@@ -171,7 +172,13 @@ export default function Header() {
                 <MenuItem onClick={handleClose}>Production3</MenuItem>
               </Menu>
             </div>
-
+            <Box display='flex' flexGrow={1} justifyContent='flex-end' >
+            <Stack spacing={4} direction="row" sx={{ color: 'action.active' }} >
+              <Badge color="secondary" badgeContent={0} showZero style={{cursor:'pointer'}}> 
+                <MailIcon />
+              </Badge>
+            </Stack>
+            </Box>
         </Toolbar>
       </AppBar>
       <Drawer

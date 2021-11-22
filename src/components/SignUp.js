@@ -46,7 +46,7 @@ const SignUp =() => {
         var google_Provide = new firebase.auth.GoogleAuthProvider();
         firebase.auth().signInWithPopup(google_Provide)
         .then((re)=>{
-            navigate("/");
+            navigate("/edit-profile");
         })
         .catch((er) =>{
             setError('Failed to sign up with Google')
@@ -57,7 +57,7 @@ const SignUp =() => {
         var facebook_Provide = new firebase.auth.FacebookAuthProvider();
         firebase.auth().signInWithPopup(facebook_Provide)
         .then((re)=>{
-            navigate("/");
+            navigate("/edit-profile");
         })
         .catch((er) =>{
             setError('Failed to sign up with Facebook')

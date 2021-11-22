@@ -1,6 +1,8 @@
 import React from 'react'
 import {useContext, useState, useEffect} from 'react'
-import {auth} from '../firebase'
+import {auth, db } from '../firebase'
+import { collection, doc, getDocs } from '@firebase/firestore'
+import { Navigate } from 'react-router'
 
 const AuthContext = React.createContext()
 
@@ -15,28 +17,38 @@ export function AuthProvider({children}) {
     
     function signup(email, password) {
         return auth.createUserWithEmailAndPassword(email, password)
+        .then((currentUser)=>{
+            currentUser.user.sendEmailVerification();
+            console.log("Email Varification Sent")
+            alert("Email Verification sent")
+        })
+        .catch(alert)
       }
 
     function login(email, password) {
+        console.log("Logged in")
         return auth.signInWithEmailAndPassword(email,password)
+
     }
 
     function logout() {
+        console.log("Logged out")
         return auth.signOut()
     }
 
     function resetPassword(email){
         return auth.sendPasswordResetEmail(email)
     }
+    const userCollectionRef = collection(db, "user")
+    const [userDocs, setUserDocs ] = useState([])
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
             setCurrentUser(user)
             setLoading(false)
-            localStorage.setItem(user, true)
-          console.log("Logged in")
+          
         })
-    
+        
         return unsubscribe
       }, [])
       

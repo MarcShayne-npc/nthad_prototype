@@ -14,7 +14,7 @@ const SignUp =() => {
     const [error, setError] =useState('')
     const [loading, setLoading] =useState(false)
     const navigate = useNavigate();
-
+    const { currentUser } = useAuth()
     //styling
     const cardStyle={padding:20,height:'450px',width:280,margin:"120px auto"}
     const h2Style={width:'100%',align:'center',borderBottom:'1px solid #000',lineHeight: '0.1em',margin:'10px 0 20px' }
@@ -25,17 +25,14 @@ const SignUp =() => {
         e.preventDefault()
         //check's if the both password are the same
         if(passwordRef.current.value !== passwordConfirmRef.current.value ){
-            return setError('Password do not match')
-        }
-        else if(passwordRef.current.value != 6){
-            return setError('Password needs to be 6 or more characters')
+            return setError('Password do not match or needs to be 6 characters or more')
         }
         
         try{
             setError("")
             setLoading(true)
             await signup(emailRef.current.value, passwordRef.current.value)
-            navigate("/");
+            navigate("/edit-profile");
         } catch{
             setError('Failed to create account')
         }

@@ -3,11 +3,7 @@ import { useState } from 'react';
 import { Grid, TextField, Avatar } from '@mui/material'
 import Header from './Header';
 import { useAuth } from '../contexts/AuthContext'
-import firebase from '@firebase/app-compat';
 import { useNavigate } from 'react-router';
-import PhoneInput from 'react-phone-input-2';
-import "react-phone-input-2/lib/style.css"
-import MuiPhoneNumber from 'material-ui-phone-number';
 
 const userInfo ={
     uid:'',
@@ -41,7 +37,7 @@ export default function EditUser() {
             <Header />
             <Grid container spacing={1} direction="row" justifyContent="center" alignItems="center" marginBottom={2} >
                 <Grid item>
-                    <Avatar sx={{width: 150, height: 150}} src="https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png" alt="ProfilePic" />
+                    <Avatar sx={{width: 150, height: 150}} src="" alt="ProfilePic" />
                 </Grid>
             </Grid>
             <strong>EMAIL: </strong> {currentUser.email}

@@ -14,17 +14,16 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { ListAlt, PermMedia, Settings, Logout, MenuBook, Login } from '@mui/icons-material';
+import { ListAlt, PermMedia, Settings, Logout, MenuBook, Create } from '@mui/icons-material';
 import { useState } from 'react';
 import { Avatar } from '@material-ui/core';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from "react-router-dom"
 import { Alert } from '@mui/material';
-import { onAuthStateChanged } from "firebase/auth"
-import { auth } from '../firebase';
-import firebase from '@firebase/app-compat';
-import { getAuth, setPersistence, signInWithEmailAndPassword, browserSessionPersistence } from "firebase/auth";
-
+import Badge from '@mui/material/Badge';
+import Stack from '@mui/material/Stack';
+import { Paper, MenuList, MenuItem, ClickAwayListener, Button, Popper, Menu } from '@mui/material';
+import { borderColor } from '@mui/system';
 
 const drawerWidth = 280;
 
@@ -73,8 +72,13 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
   justifyContent: 'flex-end',
 }));
-
-
+//style for the small avatar next to the profile
+const SmallAvatar = styled(Avatar)(({ theme }) => ({
+  width: 35,
+  height: 35,
+  border: `2px solid ${theme.palette.background.paper}`,
+  cursor:'pointer'
+}));
 
 
 
@@ -94,10 +98,15 @@ export default function Header() {
     setOpen(false);
   };
 
-  const handleSetting = () =>{
+  const handleEditProfile = () =>{
     navigate("/edit-profile")
   }
-
+  const handleProductList= () =>{
+    navigate("/production-list")
+  }
+  const handleProducerPage=()=>{
+    navigate("/producer-page")
+  }
   async function hanedleLogout(){
     setError('')
 
@@ -108,6 +117,15 @@ export default function Header() {
       setError('Failed to log out')
     }
   }
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const menuOpen = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -120,9 +138,41 @@ export default function Header() {
             onClick={handleDrawerOpen}
             edge="start"
             sx={{ mr: 2, ...(open && { display: 'none' }) }}
-          >
+            >
             <MenuIcon />
           </IconButton>
+            NTH AD
+            <div>
+              <Button
+                variant="outlined"
+                id="demo-positioned-button"
+                aria-controls="demo-positioned-menu"
+                aria-expanded={menuOpen ? 'true' : undefined}
+                aria-haspopup="true"
+                onClick={handleClick}
+                style={{color: "#FFFFFF", borderColor:"#FFFFFF", marginLeft:"20px"}}>
+                Production
+              </Button>
+              <Menu
+                id="demo-positioned-menu"
+                aria-labelledby="demo-positioned-button"
+                anchorEl={anchorEl}
+                open={menuOpen}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left',
+                }}>
+                <MenuItem onClick={handleClose}>Production1</MenuItem>
+                <MenuItem onClick={handleClose}>Production2</MenuItem>
+                <MenuItem onClick={handleClose}>Production3</MenuItem>
+              </Menu>
+            </div>
+
         </Toolbar>
       </AppBar>
       <Drawer
@@ -143,17 +193,34 @@ export default function Header() {
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
-        <Avatar alt="default" src="https://cvhrma.org/wp-content/uploads/2015/07/default-profile-photo.jpg"  style={{ height: '100px', width: '100px', alignSelf: 'center' }}/>
+        
+        <Stack direction="row" spacing={2} justifyContent='center' >
+          <Badge
+            overlap="circular"
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            badgeContent={<SmallAvatar> <Create /> </SmallAvatar>} >
+            <Avatar alt="DefaultPic" src="" style={{ height: '100px', width: '100px' ,cursor:'pointer' }} onClick={handleEditProfile}/>
+          </Badge>
+        </Stack>
+
         <strong>EMAIL: </strong> {currentUser.email}
         <strong>UID: </strong> {currentUser.uid}
         {error && <Alert severity="error">{error}</Alert>}
         <Divider />
         <List>
-          <ListItem button>
+          <ListItem button onClick={handleProductList}>
             <ListItemIcon>
               <ListAlt />
             </ListItemIcon>
             <ListItemText primary={"Product List"} />
+          </ListItem>
+          <Divider/>
+
+          <ListItem button onClick={handleProductList}>
+            <ListItemIcon>
+              <ListAlt />
+            </ListItemIcon>
+            <ListItemText primary={"Offers"} />
           </ListItem>
           <Divider/>
 
@@ -169,19 +236,19 @@ export default function Header() {
             <ListItemIcon>
               <Settings />
             </ListItemIcon>
-            <ListItemText primary={"Setting"} onClick={handleSetting} />
+            <ListItemText primary={"Setting"} />
           </ListItem>
           <Divider/>
 
-          <ListItem button>
+          <ListItem button onClick={hanedleLogout}>
             <ListItemIcon>
               <Logout />
             </ListItemIcon>
-            <ListItemText primary={"Logout"} onClick={hanedleLogout}/>
+            <ListItemText primary={"Logout"}/>
           </ListItem>
           <Divider/>
 
-          <ListItem button>
+          <ListItem button onClick={handleProducerPage}>
             <ListItemIcon>
               <MenuBook />
             </ListItemIcon>

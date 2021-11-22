@@ -1,18 +1,24 @@
 import React from 'react'
 import Header from './Header'
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router';
+import firebase from '@firebase/app-compat';
 
 
-function Dashboard(){
+function ProductionList(){
     
     const { currentUser, logout } = useAuth();
+    const navigate = useNavigate();
+
+   
 
     return (
         <div>
             <Header />
-            <strong>EMAIL: </strong> {currentUser.email}
+           
+           Product List
         </div>
     )
 }
 
-export default Dashboard
+export default ProductionList

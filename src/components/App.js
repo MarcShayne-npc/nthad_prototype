@@ -3,32 +3,29 @@ import { AuthProvider } from '../contexts/AuthContext';
 import SignUp from './SignUp';
 import { BrowserRouter as Router, Routes , Route, Outlet } from 'react-router-dom'
 import { Container } from '@material-ui/core';
-import Dashboard from './Dashboard';
+import ProductionList from './ProductionList';
 import Login from './LogIn';
 import PrivateRoute from './PrivateRoute';
 import ForgotPassword from './ForgotPassword';
 import EditUser from './EditUser';
-
+import ProductionCompany from './ProductionCompany';
+import { collection, getDocs } from "firebase/firestore"; 
+import { db } from '../firebase'
+import { useState, useEffect } from 'react';
 
 function App() {
+
   
-  function Messages () {
-    return (
-      <Container>
-        <Dashboard />
-        <EditUser />
-        <Outlet />
-      </Container>
-    )
-  }
+
   return (
     <AuthProvider>
     <Container>
       <Router>
           <Routes>
             <Route exact path="/" element={<PrivateRoute />}>
-              <Route path="/dashboard" element={<Dashboard />}/>
+              <Route path="/production-list" element={<ProductionList />}/>
               <Route exact path ="/edit-profile" element={<EditUser />} />
+              <Route exact path ="/producer-page" element={<ProductionCompany />} />
             </Route>
             <Route path="/signup" element={<SignUp />}/>
             <Route path="/login" element={<Login />}/>

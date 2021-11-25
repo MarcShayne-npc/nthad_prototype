@@ -13,25 +13,23 @@ import ProductionCompany from './ProductionCompany';
 
 function App() {
 
-  
-
   return (
-    <AuthProvider>
     <Container>
+      <AuthProvider>
       <Router>
           <Routes>
+            <Route path="/signup" element={<SignUp />}/>
+            <Route path="/login" element={<Login />}/>
+            <Route path="/forgot-password" element={<ForgotPassword/>}/>
             <Route exact path="/" element={<PrivateRoute />}>
               <Route path="/production-list" element={<ProductionList />}/>
               <Route exact path ="/edit-profile" element={<EditUser />} />
               <Route exact path ="/producer-page" element={<ProductionCompany />} />
             </Route>
-            <Route path="/signup" element={<SignUp />}/>
-            <Route path="/login" element={<Login />}/>
-            <Route path="/forgot-password" element={<ForgotPassword/>}/>
           </Routes>
       </Router>
-    </Container>
         </AuthProvider>
+    </Container>
   )}
 
 export default App;

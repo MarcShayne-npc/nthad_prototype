@@ -72,9 +72,9 @@ const SignUp =() => {
                 <h1>Sign Up</h1>
                 already have an account? <Link to="/login">Log In</Link>
                 <Grid item >
-                    <TextField label="Email" type="email" inputRef={emailRef} required variant="outlined" fullWidth/>
+                    <TextField label="Email" type="email" inputRef={emailRef} required variant="outlined" style={{marginTop: "8px",marginBottom:"8px"}} fullWidth/>
                     <TextField label="Password" type="password" inputRef={passwordRef} required variant="outlined" fullWidth/>
-                    <TextField label="Password Confirmation" type="password" inputRef={passwordConfirmRef} required variant="outlined" fullWidth/>
+                    <TextField label="Password Confirmation" type="password" inputRef={passwordConfirmRef} required variant="outlined" style={{marginTop: "8px",marginBottom:"8px"}} fullWidth/>
                 </Grid>
                 <Box m={2}>
                     <Button disabled={loading} type="submit" variant="contained" color="primary" fullWidth>SignUp</Button>

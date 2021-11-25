@@ -96,7 +96,7 @@ const LogIn =() => {
                 <h1>Log In</h1>
                 Don't have an account? <Link to="/signup">Sign Up</Link>
                 <Grid item>
-                    <TextField label="Email" type="email" inputRef={emailRef} required variant="outlined" fullWidth/>
+                    <TextField label="Email" type="email" inputRef={emailRef} style={{marginTop: "8px",marginBottom:"8px"}}required variant="outlined" fullWidth/>
                 </Grid>
                 <Grid item>
                     <TextField label="Password" type="password" inputRef={passwordRef} required variant="outlined" fullWidth/>

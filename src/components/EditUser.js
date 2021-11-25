@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Grid, TextField, Avatar, Typography } from '@mui/material';
 import Header from './Header';
 import { useAuth } from '../contexts/AuthContext';
@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import { db } from '../firebase'
 import { collection, getDocs, setDoc, doc } from "firebase/firestore"; 
 import { Mail } from '@mui/icons-material';
-
+import AlertMessage from './AlertMessage';
 
 export default function EditUser() {
 
@@ -25,16 +25,16 @@ export default function EditUser() {
     const [newState, setState] = useState("");
     const [newCountry, setCountry] = useState("");
     const [newPostalcode, setPostalCode] = useState("");
-    const [newCountryCode, setCountryCode] = useState("");
-    const [newNumber, setNumber] = useState();
-    const [formValid, setFormValid] = useState(false);
+    const [newCountryCode, setCountryCode] = useState("+1");
+    const [newNumber, setNumber] = useState("");
+    const [status, setStatusBase] = useState("");
+    const [disable, setDisable] = useState(false);
 
     //current user that is logged in
     const { currentUser } = useAuth();
 
     //for debugging purposes will (REMOVE LATER)
     const usersCollectionRef = getDocs(collection(db, "user"))
-
     // Used for reference
     // Getting the document of "user" in firebase with sub content
     // useEffect(() =>{
@@ -46,52 +46,52 @@ export default function EditUser() {
     //     getUsers();
     // },[])
 
-    const isFormValid = () => {
-         if(newDisplayName == "" && newFirstName == "" ) {
-            setFormValid = false;
-         }
-         else{
-             setFormValid = true;
-         }
-      
-        
-    }
-
+    //When user press submit button
     const handleEditUser = async() =>{
-        console.log((await usersCollectionRef).docs.map((doc)=>({...doc.data(), id: doc.id})))
-        await setDoc(doc(db, "user", currentUser.uid), { 
-            user_fields:{
-                displayname: newDisplayName,
-                legalfirstname: newFirstName,
-                legallastname: newLastName,
-                stagename: newStageName,
-                email: currentUser.email,
-                hasavatar: newAvatar, 
-                birthday: newBirthday,
-            },
-            address: {
-                street: newStreet,
-                unit: newUnit,
-                city: newCity,
-                state: newState,
-                country: newCountry,
-                postalcode: newPostalcode
-            },
-            phone: {
-                countrycode: newCountryCode,
-                number: newNumber
-            },
-            productioncompaniesowned: [''],
-            productionsowned: [''],
-
-         })
-         console.log("Edit Profile Submit")
+        //Add or update document in firestore
+        //Only required fields are needed if emptry on non-required field
+        //will leave blank value or string
+        try{
+            console.log(newStreet)
+            await setDoc(doc(db, "user", currentUser.uid), { 
+                user_fields:{
+                    displayname: newDisplayName,
+                    legalfirstname: newFirstName,
+                    legallastname: newLastName,
+                    stagename: newStageName,
+                    email: currentUser.email,
+                    hasavatar: newAvatar, 
+                    birthday: newBirthday,
+                },
+                address: {
+                    street: newStreet,
+                    unit: newUnit,
+                    city: newCity,
+                    state: newState,
+                    country: newCountry,
+                    postalcode: newPostalcode
+                },
+                phone: {
+                    countrycode: newCountryCode,
+                    number: newNumber
+                },
+                productioncompaniesowned: [''],
+                productionsowned: [''],
+    
+             })
+             setStatusBase({ lvl:"success",msg: "Account Edited/Updated", key: Math.random() });
+             console.log("Edit Profile Submit")
+        }
+        //when user required field is empty
+        catch{
+            setStatusBase({ lvl:"error",msg: "Failed to edit account", key: Math.random() });
+            console.log("Failled to edit account")
+        }
     }
 
     return (
         <form>
             <Header />
-
             <Grid container spacing={1} direction="row" justifyContent="center" alignItems="center" marginBottom={2} >
                 <Grid item>
                     <Avatar sx={{width: 150, height: 150}} src="" alt="ProfilePic" />
@@ -111,19 +111,19 @@ export default function EditUser() {
 
             <Grid container columnSpacing={1} rowSpacing={1} direction="row" justifyContent="center" alignItems="center" marginBottom={1}>
                 <Grid item xs={11} sm={8} md={3}>
-                    <TextField label="User Display Name*" id="outlined-required" type="text" variant="outlined" onChange={(event) => {setDisplayName(event.target.value)}} sx={{width: '100%'}} />
+                    <TextField error={newDisplayName===""} helperText={newDisplayName === "" ? 'Required' : ' '} label="User Display Name*" id="outlined-required" type="text" variant="outlined" onChange={(event) => {setDisplayName(event.target.value)}} sx={{width: '100%'}} />
                 </Grid>
                 <Grid item xs={11} sm={8} md={3}>
-                    <TextField label="Stage Name*" id="outlined-required" type="text" variant="outlined" onChange={(event) => {setStageName(event.target.value)}} sx={{width: '100%'}}/>
+                    <TextField label="Stage Name*" error={newStageName===""} helperText={newStageName === "" ? 'Required' : ' '} id="outlined-required" type="text" variant="outlined" onChange={(event) => {setStageName(event.target.value)}} sx={{width: '100%'}}/>
                 </Grid>
             </Grid>
 
             <Grid container columnSpacing={1} rowSpacing={1} direction="row" justifyContent="center" alignItems="center" marginBottom={1} > 
                 <Grid item xs={11} sm={8} md={3}>
-                    <TextField label="First Name*" type="text" variant="outlined" onChange={(event) => {setFirstName(event.target.value)}} sx={{width: '100%'}} />
+                    <TextField label="First Name*" error={newFirstName===""} helperText={newFirstName === "" ? 'Required' : ' '} type="text" variant="outlined" onChange={(event) => {setFirstName(event.target.value)}} sx={{width: '100%'}} />
                 </Grid>
                 <Grid item xs={11} sm={8} md={3}>
-                    <TextField label="Last Name*" type="text" variant="outlined" onChange={(event) => {setLastName(event.target.value)}} sx={{width: '100%'}}/>
+                    <TextField label="Last Name*" error={newLastName===""} helperText={newLastName === "" ? 'Required' : ' '} type="text" variant="outlined" onChange={(event) => {setLastName(event.target.value)}} sx={{width: '100%'}}/>
                 </Grid>
             </Grid>
 
@@ -136,7 +136,7 @@ export default function EditUser() {
                     </Grid>
                
                     <Grid item xs={11} sm={8} md={2}>
-                        <TextField label="Birthday*" InputLabelProps={{shrink: true,}} type="date" variant="outlined" onChange={(event) => {setBirthday(event.target.value)}} sx={{width: 1}}/>
+                        <TextField label="Birthday*" error={newBirthday=== ""} helperText={newBirthday === Date(0) ? 'Required' : ''} InputLabelProps={{shrink: true,}} type="date" variant="outlined" onChange={(event) => {setBirthday(event.target.value)}} sx={{width: 1}}/>
                     </Grid>
             </Grid>
             
@@ -184,7 +184,8 @@ export default function EditUser() {
 
             <Grid container columnSpacing={5} rowSpacing={5} direction="row" justifyContent="right" alignItems="center" marginBottom={1} > 
                 <Grid item xs={4}>
-                    <Button onClick={handleEditUser} variant="outlined">Update</Button>
+                <Button onClick={handleEditUser} variant="outlined">Update</Button>
+                {status ? <AlertMessage level={status.lvl}key={status.key} message={status.msg} /> : null}
                 </Grid>
             </Grid>
         </form>

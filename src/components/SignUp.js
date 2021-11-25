@@ -4,7 +4,7 @@ import { Box, Card, Grid , TextField, Button } from '@material-ui/core';
 import { useAuth } from '../contexts/AuthContext'
 import Alert from '@mui/material/Alert';
 import { Link, useNavigate } from 'react-router-dom'
-import firebase from '@firebase/app-compat';
+
 const SignUp =() => {
     
     //references and state
@@ -18,8 +18,7 @@ const SignUp =() => {
 
     //styling
     const cardStyle={padding:20,height:'450px',width:280,margin:"120px auto"}
-    const h2Style={width:'100%',align:'center',borderBottom:'1px solid #000',lineHeight: '0.1em',margin:'10px 0 20px' }
-    const spanStyle={background:'#fff',padding:'0 10px'}
+
 
     //handles signup function
     async function handleSubmit(e){
@@ -39,30 +38,7 @@ const SignUp =() => {
         }
         setLoading(false)
     }
-
-    
-    //sign in with firebase google
-    const SignInWithFirebaseGoogle=()=>{
-        var google_Provide = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(google_Provide)
-        .then((re)=>{
-            navigate("/edit-profile");
-        })
-        .catch((er) =>{
-            setError('Failed to sign up with Google')
-        })
-    }
-    //sign in with firebase facebook
-    const SignInWithFirebaseFacebook=()=>{
-        var facebook_Provide = new firebase.auth.FacebookAuthProvider();
-        firebase.auth().signInWithPopup(facebook_Provide)
-        .then((re)=>{
-            navigate("/edit-profile");
-        })
-        .catch((er) =>{
-            setError('Failed to sign up with Facebook')
-        })
-    }
+  
 
     return (
         <Grid container>
@@ -79,9 +55,7 @@ const SignUp =() => {
                 <Box m={2}>
                     <Button disabled={loading} type="submit" variant="contained" color="primary" fullWidth>SignUp</Button>
                 </Box>
-                <h2 style={h2Style}><span style={spanStyle}>OR</span></h2>
-                <Button onClick={SignInWithFirebaseGoogle} disabled={loading} variant="outlined">Google</Button>
-                <Button onClick={SignInWithFirebaseFacebook} disabled={loading} type="submit" variant="outlined">Facebook</Button>
+                
             </form>
          </Card>
         </Grid>

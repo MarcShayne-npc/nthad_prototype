@@ -1,14 +1,14 @@
 import React from "react";
 import { AuthProvider } from "../contexts/AuthContext";
-import SignUp from "./SignUp";
+import SignUp from "./Pages/SignUp";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Container } from "@material-ui/core";
-import ProductionList from "./ProductionList";
-import Login from "./LogIn";
-import PrivateRoute from "./PrivateRoute";
-import ForgotPassword from "./ForgotPassword";
-import EditUser from "./EditUser";
-import ProductionCompany from "./ProductionCompany";
+import ProductionList from "./Pages/ProductionList";
+import Login from "./Pages/LogIn";
+import PrivateRoute from "./Tools&Hooks/PrivateRoute";
+import ForgotPassword from "./Pages/ForgotPassword";
+import EditUser from "./Pages/EditUser";
+import ProductionCompany from "./Pages/ProductionCompany";
 
 function App() {
   return (

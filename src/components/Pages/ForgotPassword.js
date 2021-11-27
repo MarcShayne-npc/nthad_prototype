@@ -1,7 +1,7 @@
 import React from "react";
 import { useRef, useState } from "react";
 import { Box, Card, Grid, TextField, Button } from "@material-ui/core";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import Alert from "@mui/material/Alert";
 import { Link } from "react-router-dom";
 

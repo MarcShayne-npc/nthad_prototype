@@ -24,7 +24,7 @@ import {
 } from "@mui/icons-material";
 import { useState } from "react";
 import { Avatar } from "@material-ui/core";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Alert } from "@mui/material";
 import Badge from "@mui/material/Badge";

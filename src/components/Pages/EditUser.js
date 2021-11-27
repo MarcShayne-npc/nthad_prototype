@@ -1,13 +1,13 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { Grid, TextField, Avatar, Typography } from "@mui/material";
-import Header from "./Header";
-import { useAuth } from "../contexts/AuthContext";
+import Header from "../Tools&Hooks/Header";
+import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
-import { db } from "../firebase";
+import { db } from "../../firebase";
 import { getDoc, setDoc, doc } from "firebase/firestore";
 import { Mail } from "@mui/icons-material";
-import AlertMessage from "./Tools&Hooks/AlertMessage";
+import AlertMessage from "../Tools&Hooks/AlertMessage";
 
 export default function EditUser() {
   //all the data that is being pass through firestore

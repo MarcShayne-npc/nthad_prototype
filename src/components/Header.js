@@ -1,95 +1,98 @@
-import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import { ListAlt, PermMedia, Settings, Logout, MenuBook, Create } from '@mui/icons-material';
-import { useState } from 'react';
-import { Avatar } from '@material-ui/core';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from "react-router-dom"
-import { Alert } from '@mui/material';
-import Badge from '@mui/material/Badge';
-import Stack from '@mui/material/Stack';
-import { MenuItem,  Button, Menu } from '@mui/material';
-import MailIcon from '@mui/icons-material/Mail';
+import * as React from "react";
+import { styled, useTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import CssBaseline from "@mui/material/CssBaseline";
+import MuiAppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import {
+  ListAlt,
+  PermMedia,
+  Settings,
+  Logout,
+  MenuBook,
+  Create,
+} from "@mui/icons-material";
+import { useState } from "react";
+import { Avatar } from "@material-ui/core";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { Alert } from "@mui/material";
+import Badge from "@mui/material/Badge";
+import Stack from "@mui/material/Stack";
+import { MenuItem, Button, Menu } from "@mui/material";
+import MailIcon from "@mui/icons-material/Mail";
 
 const drawerWidth = 280;
 
-
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
+    transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
     marginLeft: `-${drawerWidth}px`,
     ...(open && {
-      transition: theme.transitions.create('margin', {
+      transition: theme.transitions.create("margin", {
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
       }),
       marginLeft: 0,
     }),
-  }),
+  })
 );
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
+  shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
-  transition: theme.transitions.create(['margin', 'width'], {
+  transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(['margin', 'width'], {
+    transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
 }));
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
+  justifyContent: "flex-end",
 }));
 //style for the small avatar next to the profile
 const SmallAvatar = styled(Avatar)(({ theme }) => ({
   width: 35,
   height: 35,
   border: `2px solid ${theme.palette.background.paper}`,
-  cursor:'pointer'
+  cursor: "pointer",
 }));
-
-
 
 export default function Header() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const [error , setError ] = useState();
+  const [error, setError] = useState();
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-  
-  
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -98,23 +101,23 @@ export default function Header() {
     setOpen(false);
   };
 
-  const handleEditProfile = () =>{
-    navigate("/edit-profile")
-  }
-  const handleProductList= () =>{
-    navigate("/production-list")
-  }
-  const handleProducerPage=()=>{
-    navigate("/producer-page")
-  }
-  async function hanedleLogout(){
-    setError('')
+  const handleEditProfile = () => {
+    navigate("/edit-profile");
+  };
+  const handleProductList = () => {
+    navigate("/production-list");
+  };
+  const handleProducerPage = () => {
+    navigate("/producer-page");
+  };
+  async function hanedleLogout() {
+    setError("");
 
-    try{
-        await logout()
-        navigate("/login")
-    }catch{
-      setError('Failed to log out')
+    try {
+      await logout();
+      navigate("/login");
+    } catch {
+      setError("Failed to log out");
     }
   }
 
@@ -128,7 +131,7 @@ export default function Header() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
@@ -137,57 +140,68 @@ export default function Header() {
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
-            sx={{ mr: 2, ...(open && { display: 'none' }) }}
-            >
+            sx={{ mr: 2, ...(open && { display: "none" }) }}
+          >
             <MenuIcon />
           </IconButton>
-            NTH AD
-            <div>
-              <Button
-                variant="outlined"
-                id="demo-positioned-button"
-                aria-controls="demo-positioned-menu"
-                aria-expanded={menuOpen ? 'true' : undefined}
-                aria-haspopup="true"
-                onClick={handleClick}
-                style={{color: "#FFFFFF", borderColor:"#FFFFFF", marginLeft:"20px"}}>
-                Select Production
-              </Button>
-              <Menu
-                id="demo-positioned-menu"
-                aria-labelledby="demo-positioned-button"
-                anchorEl={anchorEl}
-                open={menuOpen}
-                onClose={handleClose}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}>
-                <MenuItem onClick={handleClose}>Production1</MenuItem>
-                <MenuItem onClick={handleClose}>Production2</MenuItem>
-                <MenuItem onClick={handleClose}>Production3</MenuItem>
-              </Menu>
-            </div>
-            <Box display='flex' flexGrow={1} justifyContent='flex-end' >
-            <Stack spacing={4} direction="row" sx={{ color: 'action.active' }} >
-              <Badge color="secondary" badgeContent={0} showZero style={{cursor:'pointer'}}> 
+          NTH AD
+          <div>
+            <Button
+              variant="outlined"
+              id="demo-positioned-button"
+              aria-controls="demo-positioned-menu"
+              aria-expanded={menuOpen ? "true" : undefined}
+              aria-haspopup="true"
+              onClick={handleClick}
+              style={{
+                color: "#FFFFFF",
+                borderColor: "#FFFFFF",
+                marginLeft: "20px",
+              }}
+            >
+              Select Production
+            </Button>
+            <Menu
+              id="demo-positioned-menu"
+              aria-labelledby="demo-positioned-button"
+              anchorEl={anchorEl}
+              open={menuOpen}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              <MenuItem onClick={handleClose}>Production1</MenuItem>
+              <MenuItem onClick={handleClose}>Production2</MenuItem>
+              <MenuItem onClick={handleClose}>Production3</MenuItem>
+            </Menu>
+          </div>
+          <Box display="flex" flexGrow={1} justifyContent="flex-end">
+            <Stack spacing={4} direction="row" sx={{ color: "action.active" }}>
+              <Badge
+                color="secondary"
+                badgeContent={0}
+                showZero
+                style={{ cursor: "pointer" }}
+              >
                 <MailIcon />
               </Badge>
             </Stack>
-            </Box>
+          </Box>
         </Toolbar>
       </AppBar>
       <Drawer
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          '& .MuiDrawer-paper': {
+          "& .MuiDrawer-paper": {
             width: drawerWidth,
-            boxSizing: 'border-box',
+            boxSizing: "border-box",
           },
         }}
         variant="persistent"
@@ -196,19 +210,32 @@ export default function Header() {
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            {theme.direction === "ltr" ? (
+              <ChevronLeftIcon />
+            ) : (
+              <ChevronRightIcon />
+            )}
           </IconButton>
         </DrawerHeader>
-        
-        <Stack direction="row" spacing={2} justifyContent='center' >
+        <Stack direction="row" spacing={2} justifyContent="center">
           <Badge
             overlap="circular"
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            badgeContent={<SmallAvatar> <Create /> </SmallAvatar>} >
-            <Avatar alt="DefaultPic" src="" style={{ height: '100px', width: '100px' ,cursor:'pointer' }} onClick={handleEditProfile}/>
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            badgeContent={
+              <SmallAvatar>
+                {" "}
+                <Create />{" "}
+              </SmallAvatar>
+            }
+          >
+            <Avatar
+              alt="DefaultPic"
+              src=""
+              style={{ height: "100px", width: "100px", cursor: "pointer" }}
+              onClick={handleEditProfile}
+            />
           </Badge>
         </Stack>
-
         <strong>EMAIL: </strong> {currentUser.email}
         <strong>UID: </strong> {currentUser.uid}
         {error && <Alert severity="error">{error}</Alert>}
@@ -220,7 +247,7 @@ export default function Header() {
             </ListItemIcon>
             <ListItemText primary={"Product List"} />
           </ListItem>
-          <Divider/>
+          <Divider />
 
           <ListItem button onClick={handleProductList}>
             <ListItemIcon>
@@ -228,7 +255,7 @@ export default function Header() {
             </ListItemIcon>
             <ListItemText primary={"Offers"} />
           </ListItem>
-          <Divider/>
+          <Divider />
 
           <ListItem button>
             <ListItemIcon>
@@ -236,23 +263,23 @@ export default function Header() {
             </ListItemIcon>
             <ListItemText primary={"Gallery"} />
           </ListItem>
-          <Divider/>
-          
+          <Divider />
+
           <ListItem button>
             <ListItemIcon>
               <Settings />
             </ListItemIcon>
             <ListItemText primary={"Setting"} />
           </ListItem>
-          <Divider/>
+          <Divider />
 
           <ListItem button onClick={hanedleLogout}>
             <ListItemIcon>
               <Logout />
             </ListItemIcon>
-            <ListItemText primary={"Logout"}/>
+            <ListItemText primary={"Logout"} />
           </ListItem>
-          <Divider/>
+          <Divider />
 
           <ListItem button onClick={handleProducerPage}>
             <ListItemIcon>
@@ -260,7 +287,7 @@ export default function Header() {
             </ListItemIcon>
             <ListItemText primary={"Producer Pages"} />
           </ListItem>
-          <Divider/>
+          <Divider />
         </List>
       </Drawer>
       <Main open={open}>

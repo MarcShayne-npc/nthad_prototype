@@ -10,21 +10,7 @@ import { Mail } from "@mui/icons-material";
 import AlertMessage from "../Tools&Hooks/AlertMessage";
 
 export default function EditUser() {
-  //all the data that is being pass through firestore
-  //There is no "productioncompaniesowned" and productionsowned defaulted to be an empty array
-
-  const [newFirstName, setFirstName] = useState("");
-  const [newLastName, setLastName] = useState("");
   const [newAvatar, setAvatar] = useState(false);
-  const [newBirthday, setBirthday] = useState(new Date(0, 0, 0));
-  const [newStreet, setStreet] = useState("");
-  const [newUnit, setUnit] = useState("");
-  const [newCity, setCity] = useState("");
-  const [newState, setState] = useState("");
-  const [newCountry, setCountry] = useState("");
-  const [newPostalcode, setPostalCode] = useState("");
-  const [newCountryCode, setCountryCode] = useState("+1");
-  const [newNumber, setNumber] = useState("");
 
   //Set AlertMessage Status and passes to Alertmessage hook
   const [status, setStatusBase] = useState("");
@@ -37,11 +23,22 @@ export default function EditUser() {
   const documentId = currentUser.uid;
 
   //User Data in firestore this is null if the user is new
+  //all the data that is being pass through firestore
+  //There is no "productioncompaniesowned" and productionsowned defaulted to be an empty array
   const [userData, setUserData] = useState({
-    displayname: null,
-    stagename: null,
-    firstname: null,
-    lastname: null,
+    displayname: "",
+    stagename: "",
+    firstname: "",
+    lastname: "",
+    birthday: "2017-05-24",
+    city: "",
+    country: "",
+    postalcode: "",
+    state: "",
+    street: "",
+    unit: "",
+    countrycode: "",
+    number: "",
   });
 
   //when User first loads in EditUser
@@ -50,15 +47,25 @@ export default function EditUser() {
   useEffect(() => {
     const getUsers = async () => {
       setLoading(true);
+      //get Document reference from firebase by using current user uid
       const docRef = doc(db, "user", documentId);
+      //asynchronous get date from firebase then set's their data in a useState
       await getDoc(docRef)
         .then((res) => {
-          console.log(res.data().user_fields);
           setUserData({
             displayname: res.data().user_fields.displayname,
             stagename: res.data().user_fields.stagename,
             firstname: res.data().user_fields.legalfirstname,
             lastname: res.data().user_fields.legallastname,
+            birthday: res.data().user_fields.birthday,
+            city: res.data().address.city,
+            country: res.data().address.country,
+            postalcode: res.data().address.postalcode,
+            state: res.data().address.state,
+            street: res.data().address.street,
+            unit: res.data().address.unit,
+            countrycode: res.data().phone.countrycode,
+            number: res.data().phone.number,
           });
           setLoading(false);
         })
@@ -72,64 +79,80 @@ export default function EditUser() {
 
   //When user press submit button
   const handleEditUser = async () => {
-    //Add or update document in firestore
-    //Only required fields are needed if emptry on non-required field
-    //will leave blank value
+    //regex this is used later to detech letter or space only
+    const re = /^[a-zA-Z\s]*$/;
     try {
-      await setDoc(doc(db, "user", currentUser.uid), {
-        user_fields: {
-          displayname: userData.displayname,
-          legalfirstname: userData.firstname,
-          legallastname: userData.lastname,
-          stagename: userData.stagename,
-          email: currentUser.email,
-          hasavatar: newAvatar,
-          birthday: newBirthday,
-        },
-        address: {
-          street: newStreet,
-          unit: newUnit,
-          city: newCity,
-          state: newState,
-          country: newCountry,
-          postalcode: newPostalcode,
-        },
-        phone: {
-          countrycode: newCountryCode,
-          number: newNumber,
-        },
-        productioncompaniesowned: [""],
-        productionsowned: [""],
-      });
-      setStatusBase({
-        lvl: "success",
-        msg: "Account Edited/Updated",
-        key: Math.random(),
-      });
-      console.log("Edit Profile Submit");
+      //Checks if userData.firstname & .lastname is letters and space only
+      if (
+        re.test(userData.firstname) &&
+        re.test(userData.lastname) &&
+        userData.firstname.trim() !== "" &&
+        userData.lastname.trim() !== ""
+      ) {
+        //Then Add or update document in firestore
+        //Only required fields are needed if empty on non-required field
+        //will leave blank value
+        await setDoc(doc(db, "user", currentUser.uid), {
+          user_fields: {
+            displayname: userData.displayname,
+            legalfirstname: userData.firstname,
+            legallastname: userData.lastname,
+            stagename: userData.stagename,
+            email: currentUser.email,
+            hasavatar: newAvatar,
+            birthday: userData.birthday,
+          },
+          address: {
+            street: userData.street,
+            unit: userData.unit,
+            city: userData.city,
+            state: userData.state,
+            country: userData.country,
+            postalcode: userData.postalcode,
+          },
+          phone: {
+            countrycode: userData.countrycode,
+            number: userData.number,
+          },
+          productioncompaniesowned: [""],
+          productionsowned: [""],
+        });
+        //set the Alert to Success and display message
+        setStatusBase({
+          lvl: "success",
+          msg: "Account Edited/Updated",
+          key: Math.random(),
+        });
+        console.log("Edit Profile Submit");
+      } else if (
+        userData.firstname === "" ||
+        userData.lastname === "" ||
+        userData.displayname === "" ||
+        userData.stagename === ""
+      ) {
+        //when user required field is empty
+        setStatusBase({
+          lvl: "error",
+          msg: "Required fields are empty",
+          key: Math.random(),
+        });
+      } else {
+        //set the Alert to error and display message
+        setStatusBase({
+          lvl: "error",
+          msg: "Only letters allowed in First Name & Last Name",
+          key: Math.random(),
+        });
+      }
     } catch {
-      //when user required field is empty
+      //something went wrong
       setStatusBase({
         lvl: "error",
-        msg: "Failed to edit account",
+        msg: "Failed to edit account.",
         key: Math.random(),
       });
       console.log("Failled to edit account");
     }
-  };
-
-  //removes numbers and symbols from firstname letters only
-  const onChangeFirstName = (e) => {
-    const re = /^[a-zA-Z\s]*$/;
-    if (re.test(e.target.value))
-      setUserData({ [e.target.name]: e.target.value });
-  };
-
-  //removes numbers and symbols from lastname letters only
-  const onChangeLastName = (e) => {
-    const re = /^[A-Za-z]+$/;
-    if (e.target.value === "" || re.test(e.target.value))
-      setLastName(e.target.value);
   };
 
   return (
@@ -245,19 +268,30 @@ export default function EditUser() {
                 type="text"
                 variant="outlined"
                 value={userData.firstname}
-                onChange={onChangeFirstName}
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
+                }}
                 sx={{ width: "100%" }}
               />
             </Grid>
             <Grid item xs={11} sm={8} md={3}>
               <TextField
                 label="Last Name*"
-                error={newLastName === ""}
-                helperText={newLastName === "" ? "Required" : " "}
+                name="lastname"
+                error={userData.lastname === ""}
+                helperText={userData.lastname === "" ? "Required" : " "}
                 type="text"
                 variant="outlined"
-                value={newLastName}
-                onChange={onChangeLastName}
+                value={userData.lastname}
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
+                }}
                 sx={{ width: "100%" }}
               />
             </Grid>
@@ -291,14 +325,18 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={2}>
               <TextField
                 label="Birthday*"
-                defaultValue="2017-05-24"
-                error={newBirthday === ""}
-                helperText={newBirthday === "" ? "Required" : ""}
+                name="birthday"
+                value={userData.birthday}
+                error={userData.birthday === ""}
+                helperText={userData.birthday === "" ? "Required" : ""}
                 InputLabelProps={{ shrink: true }}
                 type="date"
                 variant="outlined"
-                onChange={(event) => {
-                  setBirthday(event.target.value);
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
                 }}
                 sx={{ width: "100%" }}
               />
@@ -331,10 +369,16 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={2} textAlign="center">
               <TextField
                 label="Country Code"
+                defaultValue="+1"
+                name="countrycode"
+                value={userData.countrycode}
                 type="text"
                 variant="outlined"
-                onChange={(event) => {
-                  setCountryCode(event.target.value);
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
                 }}
                 sx={{ width: 1 }}
               />
@@ -342,10 +386,15 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={4} textAlign="center">
               <TextField
                 label="Phone number"
+                name="number"
+                value={userData.number}
                 type="tel"
                 variant="outlined"
-                onChange={(event) => {
-                  setNumber(event.target.value);
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
                 }}
                 sx={{ width: 1 }}
               />
@@ -364,10 +413,15 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={6} textAlign="center">
               <TextField
                 label="Country"
+                name="country"
+                value={userData.country}
                 type="text"
                 variant="outlined"
-                onChange={(event) => {
-                  setCountry(event.target.value);
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
                 }}
                 sx={{ width: 1 }}
               />
@@ -386,10 +440,15 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={3} textAlign="right">
               <TextField
                 label="City"
+                name="city"
+                value={userData.city}
                 type="text"
                 variant="outlined"
-                onChange={(event) => {
-                  setCity(event.target.value);
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
                 }}
                 sx={{ width: "100%" }}
               />
@@ -397,10 +456,15 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={3}>
               <TextField
                 label="State"
+                name="state"
+                value={userData.state}
                 type="text"
                 variant="outlined"
-                onChange={(event) => {
-                  setState(event.target.value);
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
                 }}
                 sx={{ width: "100%" }}
               />
@@ -419,10 +483,15 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={2}>
               <TextField
                 label="Postal Code"
+                name="postalcode"
+                value={userData.postalcode}
                 type="text"
                 variant="outlined"
-                onChange={(event) => {
-                  setPostalCode(event.target.value);
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
                 }}
                 sx={{ width: "100%" }}
               />
@@ -430,10 +499,15 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={2}>
               <TextField
                 label="Street"
+                name="street"
+                value={userData.street}
                 type="text"
                 variant="outlined"
-                onChange={(event) => {
-                  setStreet(event.target.value);
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
                 }}
                 sx={{ width: "100%" }}
               />
@@ -441,10 +515,15 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={2}>
               <TextField
                 label="Unit"
+                name="unit"
+                value={userData.unit}
                 type="text"
                 variant="outlined"
-                onChange={(event) => {
-                  setUnit(event.target.value);
+                onChange={(e) => {
+                  setUserData({
+                    ...userData,
+                    [e.target.name]: e.target.value,
+                  });
                 }}
                 sx={{ width: 1 }}
               />

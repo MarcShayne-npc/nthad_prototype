@@ -118,6 +118,7 @@ const LogIn = () => {
               required
               variant="outlined"
               fullWidth
+              style={{ marginTop: "8px", marginBottom: "8px" }}
             />
           </Grid>
           <Grid item>

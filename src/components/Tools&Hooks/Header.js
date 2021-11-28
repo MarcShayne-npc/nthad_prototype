@@ -22,7 +22,7 @@ import {
   MenuBook,
   Create,
 } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar } from "@material-ui/core";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +31,8 @@ import Badge from "@mui/material/Badge";
 import Stack from "@mui/material/Stack";
 import { MenuItem, Button, Menu } from "@mui/material";
 import MailIcon from "@mui/icons-material/Mail";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../../firebase";
 
 const drawerWidth = 280;
 
@@ -120,6 +122,36 @@ export default function Header() {
       setError("Failed to log out");
     }
   }
+  //current user that is logged in
+  const documentId = currentUser.uid;
+
+  //User Data in firestore this is null if the user is new
+  //all the data that is being pass through firestore
+  //There is no "productioncompaniesowned" and productionsowned defaulted to be an empty array
+  const [userData, setUserData] = useState({
+    displayname: "",
+  });
+
+  //when User first loads in EditUser
+  //Get Doc from firebase and set the value to userData
+  //then later used to print the value in the TextFields
+  useEffect(() => {
+    const getUsers = async () => {
+      //get Document reference from firebase by using current user uid
+      const docRef = doc(db, "user", documentId);
+      //asynchronous get date from firebase then set's their data in a useState
+      await getDoc(docRef)
+        .then((res) => {
+          setUserData({
+            displayname: res.data().user_fields.displayname,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+    getUsers();
+  }, []);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const menuOpen = Boolean(anchorEl);
@@ -236,8 +268,11 @@ export default function Header() {
             />
           </Badge>
         </Stack>
-        <strong>EMAIL: </strong> {currentUser.email}
-        <strong>UID: </strong> {currentUser.uid}
+        <Stack direction="row" spacing={2} justifyContent="center">
+          <h2>
+            <strong>{userData.displayname}</strong>
+          </h2>
+        </Stack>
         {error && <Alert severity="error">{error}</Alert>}
         <Divider />
         <List>

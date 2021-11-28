@@ -4,10 +4,17 @@ import { Grid, TextField, Avatar, Typography } from "@mui/material";
 import Header from "../Tools&Hooks/Header";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
-import { db } from "../../firebase";
+import { db, storage } from "../../firebase";
 import { getDoc, setDoc, doc } from "firebase/firestore";
 import { Mail } from "@mui/icons-material";
 import AlertMessage from "../Tools&Hooks/AlertMessage";
+import { styled } from "@mui/material/styles";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+
+//style for upload button from Mui
+const Input = styled("input")({
+  display: "none",
+});
 
 export default function EditUser() {
   const [newAvatar, setAvatar] = useState(false);
@@ -155,6 +162,41 @@ export default function EditUser() {
     }
   };
 
+  //sets the url image to update Avatar
+  const [url, setUrl] = useState("");
+  //sets the image for passing to handleUpload
+  const handleImage = (e) => {
+    console.log(e.target.files[0]);
+    if (e.target.files[0].size <= 200000) {
+      const storageRef = ref(
+        storage,
+        `/user/${documentId}/${e.target.files[0].name}`
+      );
+      const uploadTask = uploadBytesResumable(storageRef, e.target.files[0]);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {},
+        (err) => console.log(err),
+        () => {
+          setStatusBase({
+            lvl: "success",
+            msg: "Uploaded file",
+            key: Math.random(),
+          });
+          setAvatar(true);
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => setUrl(url));
+        }
+      );
+    } else {
+      setStatusBase({
+        lvl: "error",
+        msg: "File must be less than 200kb",
+        key: Math.random(),
+      });
+    }
+  };
+
   return (
     <form>
       <Header />
@@ -172,12 +214,23 @@ export default function EditUser() {
             <Grid item>
               <Avatar
                 sx={{ width: 150, height: 150 }}
-                src=""
+                src={url}
                 alt="ProfilePic"
               />
             </Grid>
             <Grid item xs={4}>
-              <Button variant="outlined">Upload</Button>
+              <label htmlFor="contained-button-file">
+                <Input
+                  accept=".jpg"
+                  id="contained-button-file"
+                  multiple
+                  type="file"
+                  onChange={handleImage}
+                />
+                <Button variant="contained" component="span">
+                  Upload
+                </Button>
+              </label>
               <Typography variant="subtitle1">
                 Image format must be JPG only
               </Typography>

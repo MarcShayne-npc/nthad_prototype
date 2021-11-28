@@ -5,7 +5,7 @@ import Header from "../Tools&Hooks/Header";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
 import { db, storage } from "../../firebase";
-import { getDoc, setDoc, doc } from "firebase/firestore";
+import { getDoc, setDoc, doc, updateDoc } from "firebase/firestore";
 import { Mail } from "@mui/icons-material";
 import AlertMessage from "../Tools&Hooks/AlertMessage";
 import { styled } from "@mui/material/styles";
@@ -184,7 +184,9 @@ export default function EditUser() {
             msg: "Uploaded file",
             key: Math.random(),
           });
-          setAvatar(true);
+          updateDoc(doc(db, "user", currentUser.uid), {
+            "user_fields.hasavatar": true,
+          });
           getDownloadURL(uploadTask.snapshot.ref).then((url) => setUrl(url));
         }
       );

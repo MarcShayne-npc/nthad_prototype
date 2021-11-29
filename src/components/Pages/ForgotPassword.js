@@ -44,7 +44,7 @@ const ForgotPassword = () => {
         {message && <Alert severity="success">{message}</Alert>}
         <form onSubmit={handleSubmit}>
           <h1>Reset Password</h1>
-          Have an account <Link to="/login">Log in</Link>
+          Have an account <Link to="/">Log in</Link>
           <Grid item>
             <TextField
               label="Email"

@@ -50,7 +50,7 @@ const SignUp = () => {
         {error && <Alert severity="error">{error}</Alert>}
         <form onSubmit={handleSubmit}>
           <h1>Sign Up</h1>
-          already have an account? <Link to="/login">Log In</Link>
+          already have an account? <Link to="/">Log In</Link>
           <Grid item>
             <TextField
               label="Email"

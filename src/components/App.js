@@ -17,7 +17,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route exact path="/" element={<PrivateRoute />}>
               <Route path="/production-list" element={<ProductionList />} />

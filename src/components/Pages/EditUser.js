@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Grid, TextField, Avatar, Typography } from "@mui/material";
 import Header from "../Tools&Hooks/Header";
 import { useAuth } from "../../contexts/AuthContext";
@@ -10,6 +10,7 @@ import { Mail } from "@mui/icons-material";
 import AlertMessage from "../Tools&Hooks/AlertMessage";
 import { styled } from "@mui/material/styles";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
 
 //style for upload button from Mui
 const Input = styled("input")({
@@ -17,8 +18,6 @@ const Input = styled("input")({
 });
 
 export default function EditUser() {
-  const [newAvatar, setAvatar] = useState(false);
-
   //Set AlertMessage Status and passes to Alertmessage hook
   const [status, setStatusBase] = useState("");
   //Do Api Call first and get promises doc from firestore
@@ -26,12 +25,13 @@ export default function EditUser() {
   const [loading, setLoading] = useState(true);
 
   //current user that is logged in
-  const { currentUser } = useAuth();
+  const { currentUser, userUpdateEmail } = useAuth();
   const documentId = currentUser.uid;
-
+  const navigate = useNavigate();
   //User Data in firestore this is null if the user is new
   //all the data that is being pass through firestore
   //There is no "productioncompaniesowned" and productionsowned defaulted to be an empty array
+  //some values a
   const [userData, setUserData] = useState({
     displayname: "",
     stagename: "",
@@ -44,7 +44,7 @@ export default function EditUser() {
     state: "",
     street: "",
     unit: "",
-    countrycode: "",
+    countrycode: "+1",
     number: "",
   });
 
@@ -74,6 +74,7 @@ export default function EditUser() {
             countrycode: res.data().phone.countrycode,
             number: res.data().phone.number,
           });
+          setHasAvatar(res.data().user_fields.hasavatar);
           setLoading(false);
         })
         .catch((err) => {
@@ -82,7 +83,8 @@ export default function EditUser() {
         });
     };
     getUsers();
-  }, []);
+    return setUserData({});
+  }, [documentId]);
 
   //When user press submit button
   const handleEditUser = async () => {
@@ -106,7 +108,7 @@ export default function EditUser() {
             legallastname: userData.lastname,
             stagename: userData.stagename,
             email: currentUser.email,
-            hasavatar: newAvatar,
+            hasavatar: hasAvatar,
             birthday: userData.birthday,
           },
           address: {
@@ -166,12 +168,8 @@ export default function EditUser() {
   const [url, setUrl] = useState("");
   //sets the image for passing to handleUpload
   const handleImage = (e) => {
-    console.log(e.target.files[0]);
     if (e.target.files[0].size <= 200000) {
-      const storageRef = ref(
-        storage,
-        `/user/${documentId}/${e.target.files[0].name}`
-      );
+      const storageRef = ref(storage, `/user/avatar/${documentId}`);
       const uploadTask = uploadBytesResumable(storageRef, e.target.files[0]);
 
       uploadTask.on(
@@ -198,6 +196,42 @@ export default function EditUser() {
       });
     }
   };
+  const [hasAvatar, setHasAvatar] = useState(false);
+  //sets the image on load when user have a image
+  useEffect(() => {
+    if (hasAvatar === true) {
+      const getImage = async () => {
+        const imageRef = ref(storage, `user/avatar/${documentId}`);
+        setUrl(await getDownloadURL(imageRef));
+      };
+      getImage();
+    }
+  });
+
+  const emailRef = useRef();
+  //handles signup function
+  function handleUpdateEmail(e) {
+    e.preventDefault();
+    const promises = [];
+    setLoading(true);
+    if (emailRef.current.value !== currentUser.email) {
+      promises.push(userUpdateEmail(emailRef.current.value));
+    }
+    Promise.all(promises)
+      .then(() => {
+        navigate("/");
+      })
+      .catch(() => {
+        setStatusBase({
+          lvl: "error",
+          msg: "User needs to be login recently to change Email",
+          key: Math.random(),
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
 
   return (
     <form>
@@ -366,14 +400,18 @@ export default function EditUser() {
                 label="E-Mail*"
                 id="outlined-required"
                 type="email"
+                inputRef={emailRef}
                 defaultValue={currentUser.email}
                 variant="outlined"
-                InputProps={{ readOnly: true }}
                 sx={{ width: "100%" }}
               />
             </Grid>
             <Grid item md={1}>
-              <Button variant="outlined" style={{ height: "54px" }}>
+              <Button
+                variant="outlined"
+                style={{ height: "54px" }}
+                onClick={handleUpdateEmail}
+              >
                 <Mail />
               </Button>
             </Grid>
@@ -424,7 +462,6 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={2} textAlign="center">
               <TextField
                 label="Country Code"
-                defaultValue="+1"
                 name="countrycode"
                 value={userData.countrycode}
                 type="text"

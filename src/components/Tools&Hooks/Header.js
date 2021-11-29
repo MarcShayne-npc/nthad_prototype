@@ -32,10 +32,11 @@ import Stack from "@mui/material/Stack";
 import { MenuItem, Button, Menu } from "@mui/material";
 import MailIcon from "@mui/icons-material/Mail";
 import { getDoc, doc } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db, storage } from "../../firebase";
+import { getDownloadURL, ref } from "firebase/storage";
 
 const drawerWidth = 280;
-
+//Imported most of this function in https://mui.com/components/drawers/ to find out more
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
     flexGrow: 1,
@@ -117,7 +118,7 @@ export default function Header() {
 
     try {
       await logout();
-      navigate("/login");
+      navigate("/");
     } catch {
       setError("Failed to log out");
     }
@@ -130,9 +131,9 @@ export default function Header() {
   //There is no "productioncompaniesowned" and productionsowned defaulted to be an empty array
   const [userData, setUserData] = useState({
     displayname: "",
+    hasAvatar: false,
   });
 
-  //when User first loads in EditUser
   //Get Doc from firebase and set the value to userData
   //then later used to print the value in the TextFields
   useEffect(() => {
@@ -144,6 +145,7 @@ export default function Header() {
         .then((res) => {
           setUserData({
             displayname: res.data().user_fields.displayname,
+            hasAvatar: res.data().user_fields.hasavatar,
           });
         })
         .catch((err) => {
@@ -151,7 +153,21 @@ export default function Header() {
         });
     };
     getUsers();
-  }, []);
+  }, [documentId]);
+
+  const [url, setUrl] = useState("");
+
+  useEffect(() => {
+    if (userData.hasAvatar === true) {
+      const getImage = async () => {
+        const imageRef = ref(storage, `user/avatar/${documentId}`);
+        setUrl(await getDownloadURL(imageRef));
+      };
+      getImage();
+    } else {
+      return;
+    }
+  });
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const menuOpen = Boolean(anchorEl);
@@ -262,7 +278,7 @@ export default function Header() {
           >
             <Avatar
               alt="DefaultPic"
-              src=""
+              src={url}
               style={{ height: "100px", width: "100px", cursor: "pointer" }}
               onClick={handleEditProfile}
             />

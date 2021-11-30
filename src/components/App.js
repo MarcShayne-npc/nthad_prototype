@@ -9,6 +9,7 @@ import PrivateRoute from "./Tools&Hooks/PrivateRoute";
 import ForgotPassword from "./Pages/ForgotPassword";
 import EditUser from "./Pages/EditUser";
 import ProductionCompany from "./Pages/ProductionCompany";
+import UserProfile from "./Pages/UserProfile";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
                 path="/producer-page"
                 element={<ProductionCompany />}
               />
+              <Route path="/user-profile" element={<UserProfile />} />
             </Route>
           </Routes>
         </Router>

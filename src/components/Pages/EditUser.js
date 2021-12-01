@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import { Grid, TextField, Avatar, Typography, Link } from "@mui/material";
+import { Grid, TextField, Avatar, Typography } from "@mui/material";
 import Header from "../Tools&Hooks/Header";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
@@ -209,7 +209,7 @@ export default function EditUser() {
   });
 
   const emailRef = useRef();
-  //handles signup function
+
   function handleUpdateEmail(e) {
     e.preventDefault();
     const promises = [];

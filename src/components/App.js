@@ -10,6 +10,7 @@ import ForgotPassword from "./Pages/ForgotPassword";
 import EditUser from "./Pages/EditUser";
 import ProductionCompany from "./Pages/ProductionCompany";
 import UserProfile from "./Pages/UserProfile";
+import ProductionCompanyProfileEdit from "./Pages/ProductionCompanyProfileEdit";
 
 function App() {
   return (
@@ -29,6 +30,11 @@ function App() {
                 element={<ProductionCompany />}
               />
               <Route path="/user-profile" element={<UserProfile />} />
+              <Route
+                exact
+                path="/production-company-profile-edit"
+                element={<ProductionCompanyProfileEdit />}
+              />
             </Route>
           </Routes>
         </Router>

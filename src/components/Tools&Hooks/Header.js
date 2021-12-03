@@ -155,14 +155,14 @@ export default function Header() {
     getUsers();
   }, [documentId]);
 
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState();
 
   useEffect(() => {
+    const getImage = async () => {
+      const imageRef = ref(storage, `user/avatar/${documentId}`);
+      setUrl(await getDownloadURL(imageRef));
+    };
     if (userData.hasAvatar === true) {
-      const getImage = async () => {
-        const imageRef = ref(storage, `user/avatar/${documentId}`);
-        setUrl(await getDownloadURL(imageRef));
-      };
       getImage();
     } else {
       return;

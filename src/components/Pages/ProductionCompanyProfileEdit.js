@@ -1,25 +1,23 @@
 import React from "react";
-import { useState, useEffect, useRef } from "react";
-import { Grid, TextField, Avatar, Typography } from "@mui/material";
+import { useState, useRef } from "react";
+import { Grid, TextField } from "@mui/material";
 import Header from "../Tools&Hooks/Header";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
-import { db, storage } from "../../firebase";
-import { getDoc, addDoc, collection, updateDoc, doc } from "firebase/firestore";
-import { Mail } from "@mui/icons-material";
+import { db } from "../../firebase";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+  doc,
+  updateDoc,
+  arrayUnion,
+} from "firebase/firestore";
 import AlertMessage from "../Tools&Hooks/AlertMessage";
-import { styled } from "@mui/material/styles";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import firebase from "@firebase/app-compat";
-
-//style for upload button from Mui
-const Input = styled("input")({
-  display: "none",
-});
 
 export default function ProductionCompanyProfileEdit() {
   //Set AlertMessage Status and passes to Alertmessage hook
@@ -29,159 +27,93 @@ export default function ProductionCompanyProfileEdit() {
   const [loading, setLoading] = useState(false);
 
   //current user that is logged in
-  const { currentUser, userUpdateEmail } = useAuth();
-  const documentId = currentUser.uid;
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
-  //User Data in firestore this is null if the user is new
-  //all the data that is being pass through firestore
-  //There is no "productioncompaniesowned" and productionsowned defaulted to be an empty array
-  //some values a
-  const [productionCompany, setProductionCompany] = useState({
-    updatedby: "",
-    owners: [""],
-    name: "",
-    searchable: "",
-    email: "",
-    webpage: "",
-    haslogo: "",
-    countrycode: "+",
-    number: "",
-    street: "",
-    street2: "",
-    city: "",
-    state: "",
-    country: "",
-    about: "",
-    productions: [""],
-  });
 
-  //when User first loads in EditUser
-  //Get Doc from firebase and set the value to userData
-  //then later used to print the value in the TextFields
-  //   useEffect(() => {
-  //     const getUsers = async () => {
-  //       setLoading(true);
-  //       //get Document reference from firebase by using current user uid
-  //       const docRef = doc(db, "user", documentId);
-  //       //asynchronous get date from firebase then set's their data in a useState
-  //       await getDoc(docRef)
-  //         .then((res) => {
-  //           setUserData({
-  //             displayname: res.data().user_fields.displayname,
-  //             stagename: res.data().user_fields.stagename,
-  //             firstname: res.data().user_fields.legalfirstname,
-  //             lastname: res.data().user_fields.legallastname,
-  //             birthday: res.data().user_fields.birthday,
-  //             city: res.data().address.city,
-  //             country: res.data().address.country,
-  //             postalcode: res.data().address.postalcode,
-  //             state: res.data().address.state,
-  //             street: res.data().address.street,
-  //             unit: res.data().address.unit,
-  //             countrycode: res.data().phone.countrycode,
-  //             number: res.data().phone.number,
-  //           });
-  //           setHasAvatar(res.data().user_fields.hasavatar);
-  //           setLoading(false);
-  //         })
-  //         .catch((err) => {
-  //           console.log(err);
-  //           setLoading(false);
-  //         });
-  //     };
-  //     getUsers();
-  //     return setUserData({});
-  //   }, [documentId]);
-
+  const nameRef = useRef();
+  const [searchable, setSearchable] = useState(true);
+  const emailRef = useRef();
+  const webRef = useRef();
+  const aboutRef = useRef();
+  const codeRef = useRef();
+  const phoneRef = useRef();
+  const countryRef = useRef();
+  const cityRef = useRef();
+  const stateRef = useRef();
+  const streetRef = useRef();
+  const street2Ref = useRef();
+  const [error, setError] = useState(false);
   //When user press submit button
   const handleEditUser = async () => {
     //regex this is used later to detech letter or space only
     //const re = /^[a-zA-Z\s]*$/;
-    //try {
-    await addDoc(collection(db, "productioncompany"), {
-      productioncompany_fields: {
-        updatedby: "",
-        owners: ["", ""],
-        name: "",
-        searchable: "",
-        email: "",
-        webpage: "",
-        haslogo: "",
-        phone: {
-          countrycode: "+",
-          number: "",
-        },
-        address: {
-          street: "",
-          street2: "",
-          city: "",
-          state: "",
-          country: "",
-        },
-        about: "",
-        productions: ["", ""],
-      },
-    });
-    //set the Alert to Success and display message
-    setStatusBase({
-      lvl: "success",
-      msg: "Production Company Created",
-      key: Math.random(),
-    });
-    // } catch {
-    //   //something went wrong
-    //   setStatusBase({
-    //     lvl: "error",
-    //     msg: "Failed to edit account.",
-    //     key: Math.random(),
-    //   });
-    //   console.log("Failled to edit account");
-    // }
-  };
 
-  //sets the url image to update Avatar
-  const [url, setUrl] = useState("");
-  //sets the image for passing to handleUpload
-  const handleImage = (e) => {
-    if (e.target.files[0].size <= 200000) {
-      const storageRef = ref(storage, `/user/avatar/${documentId}`);
-      const uploadTask = uploadBytesResumable(storageRef, e.target.files[0]);
-
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {},
-        (err) => console.log(err),
-        () => {
-          setStatusBase({
-            lvl: "success",
-            msg: "Uploaded file",
-            key: Math.random(),
-          });
-          updateDoc(doc(db, "user", currentUser.uid), {
-            "user_fields.hasavatar": true,
-          });
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => setUrl(url));
-        }
-      );
-    } else {
+    try {
+      if (nameRef.current.value !== "" && emailRef.current.value !== "") {
+        setError(false);
+        const productionCompanyRef = await addDoc(
+          collection(db, "productioncompany"),
+          {
+            created: serverTimestamp(),
+            updated: serverTimestamp(),
+            updatedby: currentUser.uid,
+            owners: [currentUser.uid],
+            name: nameRef.current.value,
+            searchable: searchable,
+            email: emailRef.current.value,
+            webpage: webRef.current.value,
+            haslogo: false,
+            phone: {
+              countrycode: codeRef.current.value,
+              number: phoneRef.current.value,
+            },
+            address: {
+              street: streetRef.current.value,
+              street2: street2Ref.current.value,
+              city: cityRef.current.value,
+              state: stateRef.current.value,
+              country: countryRef.current.value,
+            },
+            about: aboutRef.current.value,
+            productions: [""],
+          }
+        );
+        await updateDoc(doc(db, "user", currentUser.uid), {
+          productioncompaniesowned: arrayUnion(productionCompanyRef.id),
+        });
+        //set the Alert to Success and display message
+        setStatusBase({
+          lvl: "success",
+          msg: "Production Company Created",
+          key: Math.random(),
+        });
+      } else {
+        //if user required fields are empty
+        setError(true);
+        setStatusBase({
+          lvl: "error",
+          msg: "Required fields are empty",
+          key: Math.random(),
+        });
+      }
+    } catch {
+      //something went wrong
       setStatusBase({
         lvl: "error",
-        msg: "File must be less than 200kb",
+        msg: "Failed to Create Company.",
         key: Math.random(),
       });
     }
   };
-  const [hasAvatar, setHasAvatar] = useState(false);
-  //sets the image on load when user have a image
-  useEffect(() => {
-    if (hasAvatar === true) {
-      const getImage = async () => {
-        const imageRef = ref(storage, `user/avatar/${documentId}`);
-        setUrl(await getDownloadURL(imageRef));
-      };
-      getImage();
+
+  const handleCheckbox = (e) => {
+    if (searchable === true) {
+      setSearchable(false);
+    } else {
+      setSearchable(true);
     }
-  });
+    console.log(searchable);
+  };
 
   const handleBack = () => {
     navigate("/producer-page");
@@ -224,13 +156,18 @@ export default function ProductionCompanyProfileEdit() {
                 id="outlined-required"
                 type="text"
                 variant="outlined"
+                inputRef={nameRef}
+                error={error}
+                required
                 sx={{ width: "100%" }}
               />
             </Grid>
             <Grid item xs={11} sm={8} md={3}>
               <FormGroup>
                 <FormControlLabel
-                  control={<Checkbox defaultChecked />}
+                  control={
+                    <Checkbox onChange={handleCheckbox} defaultChecked />
+                  }
                   label="Allow Company to appear in search results"
                 />
               </FormGroup>
@@ -251,6 +188,9 @@ export default function ProductionCompanyProfileEdit() {
                 label="Email"
                 id="outlined-required"
                 type="E-Mail"
+                inputRef={emailRef}
+                error={error}
+                required
                 variant="outlined"
                 sx={{ width: "100%" }}
               />
@@ -259,7 +199,8 @@ export default function ProductionCompanyProfileEdit() {
               <TextField
                 label="Web Page"
                 id="outlined-required"
-                type="E-Mail"
+                type="text"
+                inputRef={webRef}
                 variant="outlined"
                 sx={{ width: "100%" }}
               />
@@ -281,6 +222,7 @@ export default function ProductionCompanyProfileEdit() {
                 type="text"
                 variant="outlined"
                 sx={{ width: 1 }}
+                inputRef={aboutRef}
                 multiline
                 rows={2}
                 rowsmax={4}
@@ -316,13 +258,16 @@ export default function ProductionCompanyProfileEdit() {
                 label="Country Code"
                 type="text"
                 variant="outlined"
+                inputRef={codeRef}
                 sx={{ width: 1 }}
+                defaultValue={"+1"}
               />
             </Grid>
             <Grid item xs={11} sm={8} md={4} textAlign="center">
               <TextField
                 label="Phone number"
                 type="tel"
+                inputRef={phoneRef}
                 variant="outlined"
                 sx={{ width: 1 }}
               />
@@ -343,6 +288,7 @@ export default function ProductionCompanyProfileEdit() {
                 label="Country"
                 type="text"
                 variant="outlined"
+                inputRef={countryRef}
                 sx={{ width: 1 }}
               />
             </Grid>
@@ -361,6 +307,7 @@ export default function ProductionCompanyProfileEdit() {
               <TextField
                 label="City"
                 type="text"
+                inputRef={cityRef}
                 variant="outlined"
                 sx={{ width: "100%" }}
               />
@@ -370,6 +317,7 @@ export default function ProductionCompanyProfileEdit() {
                 label="State"
                 type="text"
                 variant="outlined"
+                inputRef={stateRef}
                 sx={{ width: "100%" }}
               />
             </Grid>
@@ -388,6 +336,7 @@ export default function ProductionCompanyProfileEdit() {
               <TextField
                 label="Street"
                 type="text"
+                inputRef={streetRef}
                 variant="outlined"
                 sx={{ width: "100%" }}
               />
@@ -397,6 +346,7 @@ export default function ProductionCompanyProfileEdit() {
                 label="Street2"
                 type="text"
                 variant="outlined"
+                inputRef={street2Ref}
                 sx={{ width: "100%" }}
               />
             </Grid>
@@ -413,7 +363,7 @@ export default function ProductionCompanyProfileEdit() {
           >
             <Grid item xs={4}>
               <Button onClick={handleEditUser} variant="outlined">
-                Update
+                Create
               </Button>
               {status ? (
                 <AlertMessage

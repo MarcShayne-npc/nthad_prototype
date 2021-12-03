@@ -10,7 +10,7 @@ import ForgotPassword from "./Pages/ForgotPassword";
 import EditUser from "./Pages/EditUser";
 import ProductionCompany from "./Pages/ProductionCompany";
 import UserProfile from "./Pages/UserProfile";
-import ProductionCompanyProfileEdit from "./Pages/ProductionCompanyProfileEdit";
+import ProductionCompanyProfileCreate from "./Pages/ProductionCompanyProfileCreate";
 
 function App() {
   return (
@@ -33,7 +33,7 @@ function App() {
               <Route
                 exact
                 path="/production-company-profile-edit"
-                element={<ProductionCompanyProfileEdit />}
+                element={<ProductionCompanyProfileCreate />}
               />
             </Route>
           </Routes>

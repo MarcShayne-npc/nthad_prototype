@@ -1,25 +1,18 @@
 import React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Grid, TextField } from "@mui/material";
 import Header from "../Tools&Hooks/Header";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
 import { db } from "../../firebase";
-import {
-  addDoc,
-  collection,
-  serverTimestamp,
-  doc,
-  updateDoc,
-  arrayUnion,
-} from "firebase/firestore";
+import { serverTimestamp, doc, updateDoc, getDoc } from "firebase/firestore";
 import AlertMessage from "../Tools&Hooks/AlertMessage";
 import { useNavigate } from "react-router-dom";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 
-export default function ProductionCompanyProfileEdit() {
+export default function ProductionCompanyProfileEdit({ companyId }) {
   //Set AlertMessage Status and passes to Alertmessage hook
   const [status, setStatusBase] = useState("");
   //Do Api Call first and get promises doc from firestore
@@ -43,50 +36,91 @@ export default function ProductionCompanyProfileEdit() {
   const streetRef = useRef();
   const street2Ref = useRef();
   const [error, setError] = useState(false);
+
+  const [companyData, setCompanyData] = useState({
+    name: "",
+    email: "",
+    web: "",
+    about: "",
+    code: "+1",
+    phone: "",
+    country: "",
+    city: "",
+    state: "",
+    street: "",
+    street2: "",
+  });
+
+  useEffect(() => {
+    const getUsers = async () => {
+      setLoading(true);
+      console.log(companyId);
+      try {
+        const docRef = doc(db, "productioncompany", companyId);
+        await getDoc(docRef).then((res) => {
+          setCompanyData({
+            name: res.data().name,
+            email: res.data().email,
+            web: res.data().webpage,
+            about: res.data().about,
+            code: res.data().phone.countrycode,
+            phone: res.data().phone.number,
+            country: res.data().address.country,
+            city: res.data().address.city,
+            state: res.data().address.state,
+            street: res.data().address.street,
+            street2: res.data().address.street2,
+          });
+          setSearchable(res.data().searchable);
+        });
+      } catch {
+        setStatusBase({
+          lvl: "error",
+          msg: "Production Company was not selected",
+          key: Math.random(),
+        });
+        navigate("/producer-page");
+      }
+      setLoading(false);
+    };
+    getUsers();
+  }, [companyId, navigate]);
+
   //When user press submit button
   const handleEditUser = async () => {
-    //regex this is used later to detech letter or space only
-    //const re = /^[a-zA-Z\s]*$/;
-
     try {
       if (nameRef.current.value !== "" && emailRef.current.value !== "") {
         setError(false);
-        const productionCompanyRef = await addDoc(
-          collection(db, "productioncompany"),
-          {
-            created: serverTimestamp(),
-            updated: serverTimestamp(),
-            updatedby: currentUser.uid,
-            owners: [currentUser.uid],
-            name: nameRef.current.value,
-            searchable: searchable,
-            email: emailRef.current.value,
-            webpage: webRef.current.value,
-            haslogo: false,
-            phone: {
-              countrycode: codeRef.current.value,
-              number: phoneRef.current.value,
-            },
-            address: {
-              street: streetRef.current.value,
-              street2: street2Ref.current.value,
-              city: cityRef.current.value,
-              state: stateRef.current.value,
-              country: countryRef.current.value,
-            },
-            about: aboutRef.current.value,
-            productions: [""],
-          }
-        );
-        await updateDoc(doc(db, "user", currentUser.uid), {
-          productioncompaniesowned: arrayUnion(productionCompanyRef.id),
+        const docRef = doc(db, "productioncompany", companyId);
+        await updateDoc(docRef, {
+          updated: serverTimestamp(),
+          updatedby: currentUser.uid,
+          name: nameRef.current.value,
+          searchable: searchable,
+          email: emailRef.current.value,
+          webpage: webRef.current.value,
+          phone: {
+            countrycode: codeRef.current.value,
+            number: phoneRef.current.value,
+          },
+          address: {
+            street: streetRef.current.value,
+            street2: street2Ref.current.value,
+            city: cityRef.current.value,
+            state: stateRef.current.value,
+            country: countryRef.current.value,
+          },
+          about: aboutRef.current.value,
         });
-        //set the Alert to Success and display message
         setStatusBase({
           lvl: "success",
-          msg: "Production Company Created",
+          msg: "Production Company Updated",
           key: Math.random(),
         });
+        setTimeout(() => {
+          //set the Alert to Success and display message
+          navigate("/Production-company-dashboard");
+        }, 1000);
       } else {
         //if user required fields are empty
         setError(true);
@@ -116,7 +150,7 @@ export default function ProductionCompanyProfileEdit() {
   };
 
   const handleBack = () => {
-    navigate("/producer-page");
+    navigate("/Production-company-dashboard");
   };
 
   return (
@@ -137,7 +171,7 @@ export default function ProductionCompanyProfileEdit() {
             marginBottom={1}
           >
             <Grid item xs={11} sm={8} md={6}>
-              <h2>Create Production Company</h2>
+              <h2>Edit Production Company</h2>
             </Grid>
           </Grid>
           {/*==================Name & Searchable Name Section==================*/}
@@ -156,6 +190,7 @@ export default function ProductionCompanyProfileEdit() {
                 id="outlined-required"
                 type="text"
                 variant="outlined"
+                defaultValue={companyData.name}
                 inputRef={nameRef}
                 error={error}
                 required
@@ -166,7 +201,10 @@ export default function ProductionCompanyProfileEdit() {
               <FormGroup>
                 <FormControlLabel
                   control={
-                    <Checkbox onChange={handleCheckbox} defaultChecked />
+                    <Checkbox
+                      onChange={handleCheckbox}
+                      defaultChecked={searchable}
+                    />
                   }
                   label="Allow Company to appear in search results"
                 />
@@ -187,7 +225,8 @@ export default function ProductionCompanyProfileEdit() {
               <TextField
                 label="Email"
                 id="outlined-required"
-                type="E-Mail"
+                type="email"
+                defaultValue={companyData.email}
                 inputRef={emailRef}
                 error={error}
                 required
@@ -200,6 +239,7 @@ export default function ProductionCompanyProfileEdit() {
                 label="Web Page"
                 id="outlined-required"
                 type="text"
+                defaultValue={companyData.web}
                 inputRef={webRef}
                 variant="outlined"
                 sx={{ width: "100%" }}
@@ -222,6 +262,7 @@ export default function ProductionCompanyProfileEdit() {
                 type="text"
                 variant="outlined"
                 sx={{ width: 1 }}
+                defaultValue={companyData.about}
                 inputRef={aboutRef}
                 multiline
                 rows={2}
@@ -258,15 +299,16 @@ export default function ProductionCompanyProfileEdit() {
                 label="Country Code"
                 type="text"
                 variant="outlined"
+                defaultValue={companyData.code}
                 inputRef={codeRef}
                 sx={{ width: 1 }}
-                defaultValue={"+1"}
               />
             </Grid>
             <Grid item xs={11} sm={8} md={4} textAlign="center">
               <TextField
                 label="Phone number"
                 type="tel"
+                defaultValue={companyData.phone}
                 inputRef={phoneRef}
                 variant="outlined"
                 sx={{ width: 1 }}
@@ -288,6 +330,7 @@ export default function ProductionCompanyProfileEdit() {
                 label="Country"
                 type="text"
                 variant="outlined"
+                defaultValue={companyData.country}
                 inputRef={countryRef}
                 sx={{ width: 1 }}
               />
@@ -307,6 +350,7 @@ export default function ProductionCompanyProfileEdit() {
               <TextField
                 label="City"
                 type="text"
+                defaultValue={companyData.city}
                 inputRef={cityRef}
                 variant="outlined"
                 sx={{ width: "100%" }}
@@ -317,6 +361,7 @@ export default function ProductionCompanyProfileEdit() {
                 label="State"
                 type="text"
                 variant="outlined"
+                defaultValue={companyData.state}
                 inputRef={stateRef}
                 sx={{ width: "100%" }}
               />
@@ -336,6 +381,7 @@ export default function ProductionCompanyProfileEdit() {
               <TextField
                 label="Street"
                 type="text"
+                defaultValue={companyData.street}
                 inputRef={streetRef}
                 variant="outlined"
                 sx={{ width: "100%" }}
@@ -346,6 +392,7 @@ export default function ProductionCompanyProfileEdit() {
                 label="Street2"
                 type="text"
                 variant="outlined"
+                defaultValue={companyData.street2}
                 inputRef={street2Ref}
                 sx={{ width: "100%" }}
               />
@@ -363,7 +410,7 @@ export default function ProductionCompanyProfileEdit() {
           >
             <Grid item xs={4}>
               <Button onClick={handleEditUser} variant="outlined">
-                Create
+                Update
               </Button>
               {status ? (
                 <AlertMessage

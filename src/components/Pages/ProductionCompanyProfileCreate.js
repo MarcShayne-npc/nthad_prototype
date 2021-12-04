@@ -71,7 +71,7 @@ export default function ProductionCompanyProfileCreate() {
               country: countryRef.current.value,
             },
             about: aboutRef.current.value,
-            productions: [""],
+            productions: [],
           }
         );
         await updateDoc(doc(db, "user", currentUser.uid), {
@@ -83,7 +83,10 @@ export default function ProductionCompanyProfileCreate() {
           msg: "Production Company Created",
           key: Math.random(),
         });
-        navigate("/producer-page");
+        setTimeout(() => {
+          //set the Alert to Success and display message
+          navigate("/Production-company-dashboard");
+        }, 1000);
       } else {
         //if user required fields are empty
         setError(true);

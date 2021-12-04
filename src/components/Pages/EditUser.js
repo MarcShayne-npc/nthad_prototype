@@ -123,8 +123,8 @@ export default function EditUser() {
             countrycode: userData.countrycode,
             number: userData.number,
           },
-          productioncompaniesowned: [""],
-          productionsowned: [""],
+          productioncompaniesowned: [],
+          productionsowned: [],
         });
         //set the Alert to Success and display message
         setStatusBase({

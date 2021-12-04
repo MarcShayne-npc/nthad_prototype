@@ -11,30 +11,20 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TreeItem from "@mui/lab/TreeItem";
 
-const data2 = {
-  id: "root",
-  name: "Productions",
-  children: [
-    {
-      id: "1",
-      name: "Produtions Name",
-    },
-    {
-      id: "2",
-      name: "ProductionsName 2",
-    },
-  ],
-};
-
-export default function ProductionCompany() {
+export default function ProducerPage({ setProductionCompany }) {
   //current user that is logged in
   const { currentUser } = useAuth();
-  const documentId = currentUser.uid;
+  const userUid = currentUser.uid;
   const navigate = useNavigate();
   //Data for production Company
   const [data, setData] = useState({
     id: "root",
     name: "Production Company Owned",
+    children: [{ id: "1", name: "Company Name" }],
+  });
+  const [data2, setData2] = useState({
+    id: "root",
+    name: "Production Owned",
     children: [{ id: "1", name: "Produtions Name" }],
   });
   const [loading, setLoading] = useState(true);
@@ -42,26 +32,45 @@ export default function ProductionCompany() {
   //When page load setLoading to true
   //Get Production Company owned & production Owned
   useEffect(() => {
-    const getUsers = async () => {
+    const getProductionCompany = async () => {
       setLoading(true);
       //get Document reference from firebase by using current user uid
       //if the owners field contains user uid
       const q = query(
         collection(db, "productioncompany"),
-        where("owners", "array-contains", documentId)
+        where("owners", "array-contains", userUid)
       );
-      //Get specified docs
+      //gets document from production
+      const q2 = query(
+        collection(db, "production"),
+        where("owners", "array-contains", userUid)
+      );
+      //Get company specified docs
       const querySnapshot = await getDocs(q);
+      const querySnapshot2 = await getDocs(q2);
+      //this variables are for company
       let arr = [];
       let i = 0;
+      //this variables are for productions
+      let arr2 = [];
+      let n = 0;
       //For each company the user owned will add to children property of Data
       //also adds a Id with each children incrementing
       querySnapshot.forEach((doc) => {
         arr.push({
           id: (i + 1).toString(),
           name: doc.data().name,
+          docId: doc.id,
         });
         i++;
+      });
+      querySnapshot2.forEach((doc) => {
+        arr2.push({
+          id: (n + 1).toString(),
+          name: doc.data().name,
+          docId: doc.id,
+        });
+        n++;
         console.log(doc.id, " => ", doc.data());
       });
       //sets the Data for all the array elements in arry
@@ -70,12 +79,17 @@ export default function ProductionCompany() {
         name: "Production Company Owned",
         children: arr,
       });
+      setData2({
+        id: "root",
+        name: "Production Owned",
+        children: arr2,
+      });
       //When all is done set loading to false
       setLoading(false);
     };
 
-    getUsers();
-  }, [documentId]);
+    getProductionCompany();
+  }, [userUid]);
 
   //Mui dynamic rending for Treeitems Read more on https://mui.com/components/tree-view/#main-content
   const renderTree = (nodes) => (
@@ -91,7 +105,10 @@ export default function ProductionCompany() {
     console.log("nodeId: ", nodeId);
     if (nodeId !== "root") {
       const x = JSON.parse(nodeId) - 1;
-      console.log(data.children[x].name);
+      console.log(data.children[x].docId);
+      const companyNameRef = data.children[x].docId;
+      setProductionCompany(companyNameRef);
+      navigate("/production-company-dashboard");
     }
   }
   function action2(event, nodeId) {
@@ -101,9 +118,10 @@ export default function ProductionCompany() {
       console.log(data2.children[x].name);
     }
   }
-  const handleProductionCompanyProfileEdit = () => {
-    navigate("/production-company-profile-edit");
+  const handleProductionCompanyProfileCreate = () => {
+    navigate("/production-company-profile-create");
   };
+
   return (
     <div>
       <Header />
@@ -120,7 +138,7 @@ export default function ProductionCompany() {
             onNodeSelect={action}
           >
             {renderTree(data)}
-            <Button onClick={handleProductionCompanyProfileEdit}>
+            <Button onClick={handleProductionCompanyProfileCreate}>
               Create New Company
             </Button>
           </TreeView>
@@ -129,11 +147,10 @@ export default function ProductionCompany() {
             defaultCollapseIcon={<ExpandMoreIcon />}
             defaultExpanded={["root"]}
             defaultExpandIcon={<ChevronRightIcon />}
-            sx={{ height: 110, flexGrow: 1, maxWidth: 400, overflowY: "auto" }}
+            sx={{ height: 200, flexGrow: 1, maxWidth: 400, overflowY: "auto" }}
             onNodeSelect={action2}
           >
             {renderTree(data2)}
-            <Button>Create New Production</Button>
           </TreeView>
         </>
       ) : (

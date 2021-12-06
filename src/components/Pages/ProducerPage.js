@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../Tools&Hooks/Header";
 import { useState, useEffect } from "react";
 import { query, collection, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -20,12 +19,25 @@ export default function ProducerPage({ setProductionCompany }) {
   const [data, setData] = useState({
     id: "root",
     name: "Production Company Owned",
-    children: [{ id: "1", name: "Company Name" }],
+    children: [{ id: "1", name: "Company Name", docId: "" }],
   });
   const [data2, setData2] = useState({
-    id: "root",
+    id: "root2",
     name: "Production Owned",
-    children: [{ id: "1", name: "Produtions Name" }],
+    children: [
+      {
+        id: "Parent 1",
+        name: "Produtions Company",
+        proCoId: "",
+        children: [
+          {
+            id: "2",
+            name: "Production",
+            proId: "",
+          },
+        ],
+      },
+    ],
   });
   const [loading, setLoading] = useState(true);
 
@@ -51,28 +63,50 @@ export default function ProducerPage({ setProductionCompany }) {
       //this variables are for company
       let arr = [];
       let i = 0;
-      //this variables are for productions
+      //this variables are for productions object
       let arr2 = [];
       let n = 0;
       //For each company the user owned will add to children property of Data
       //also adds a Id with each children incrementing
+      //gets the production id
+      let arr4 = [];
+      querySnapshot2.forEach((doc) => {
+        arr2.push({
+          id: (n + 1).toString(),
+          name: doc.data().name,
+          proId: doc.id,
+        });
+        arr4.push(doc.id);
+        n++;
+      });
+      //arr to fuse both production and production company
+      let arr3 = [];
+      let y = 0;
       querySnapshot.forEach((doc) => {
+        const found = arr4.some((r) => doc.data().productions.includes(r));
+        if (found) {
+          arr3.push({
+            id: "parent " + y.toString(),
+            name: doc.data().name,
+            proCoId: doc.id,
+            children: arr2,
+          });
+        } else {
+          arr3.push({
+            id: "parent " + y.toString(),
+            name: doc.data().name,
+            proCoId: doc.id,
+          });
+        }
         arr.push({
           id: (i + 1).toString(),
           name: doc.data().name,
           docId: doc.id,
         });
         i++;
+        y++;
       });
-      querySnapshot2.forEach((doc) => {
-        arr2.push({
-          id: (n + 1).toString(),
-          name: doc.data().name,
-          docId: doc.id,
-        });
-        n++;
-        console.log(doc.id, " => ", doc.data());
-      });
+
       //sets the Data for all the array elements in arry
       setData({
         id: "root",
@@ -80,9 +114,9 @@ export default function ProducerPage({ setProductionCompany }) {
         children: arr,
       });
       setData2({
-        id: "root",
+        id: "root2",
         name: "Production Owned",
-        children: arr2,
+        children: arr3,
       });
       //When all is done set loading to false
       setLoading(false);
@@ -113,10 +147,10 @@ export default function ProducerPage({ setProductionCompany }) {
   }
   function action2(event, nodeId) {
     console.log("nodeId: ", nodeId);
-    if (nodeId !== "root") {
-      const x = JSON.parse(nodeId) - 1;
-      console.log(data2.children[x].name);
-    }
+    // if (nodeId !== "root") {
+    //   const x = JSON.parse(nodeId) - 1;
+    //   console.log(data2.children[x].name);
+    // }
   }
   const handleProductionCompanyProfileCreate = () => {
     navigate("/production-company-profile-create");
@@ -124,8 +158,6 @@ export default function ProducerPage({ setProductionCompany }) {
 
   return (
     <div>
-      <Header />
-
       {!loading ? (
         <>
           <TreeView
@@ -145,7 +177,7 @@ export default function ProducerPage({ setProductionCompany }) {
           <TreeView
             aria-label="rich object"
             defaultCollapseIcon={<ExpandMoreIcon />}
-            defaultExpanded={["root"]}
+            defaultExpanded={["root2"]}
             defaultExpandIcon={<ChevronRightIcon />}
             sx={{ height: 200, flexGrow: 1, maxWidth: 400, overflowY: "auto" }}
             onNodeSelect={action2}

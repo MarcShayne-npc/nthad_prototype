@@ -1,7 +1,6 @@
 import React from "react";
 import { useState, useRef } from "react";
 import { Grid, TextField } from "@mui/material";
-import Header from "../Tools&Hooks/Header";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
 import { db } from "../../firebase";
@@ -85,7 +84,7 @@ export default function ProductionCompanyProfileCreate() {
         });
         setTimeout(() => {
           //set the Alert to Success and display message
-          navigate("/Production-company-dashboard");
+          navigate("/production-company-dashboard");
         }, 1000);
       } else {
         //if user required fields are empty
@@ -119,7 +118,6 @@ export default function ProductionCompanyProfileCreate() {
 
   return (
     <form>
-      <Header />
       <Grid>
         {/*==================Avatar Picture Section==================*/}
         <Button onClick={handleBack}>Back</Button>

@@ -1,7 +1,6 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Grid, TextField, Avatar, Typography } from "@mui/material";
-import Header from "../Tools&Hooks/Header";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
 import { db, storage } from "../../firebase";
@@ -48,6 +47,20 @@ export default function EditUser() {
     number: "",
   });
 
+  const displayRef = useRef("");
+  const stageRef = useRef("");
+  const firstRef = useRef("");
+  const lastRef = useRef("");
+  const birthdayRef = useRef(new Date());
+  const cityRef = useRef("");
+  const countryRef = useRef("");
+  const postalRef = useRef("");
+  const stateRef = useRef("");
+  const streetRef = useRef("");
+  const unitRef = useRef("");
+  const codeRef = useRef("");
+  const numberRef = useRef("");
+
   //when User first loads in EditUser
   //Get Doc from firebase and set the value to userData
   //then later used to print the value in the TextFields
@@ -86,42 +99,50 @@ export default function EditUser() {
     return setUserData({});
   }, [documentId]);
 
+  const [error, setError] = useState({
+    fields: false,
+    name: false,
+  });
   //When user press submit button
   const handleEditUser = async () => {
     //regex this is used later to detech letter or space only
     const re = /^[a-zA-Z\s]*$/;
     try {
+      setError({ fields: false, name: false });
       //Checks if userData.firstname & .lastname is letters and space only
       if (
-        re.test(userData.firstname) &&
-        re.test(userData.lastname) &&
-        userData.firstname.trim() !== "" &&
-        userData.lastname.trim() !== ""
+        re.test(firstRef.current.value) &&
+        re.test(lastRef.current.value) &&
+        firstRef.current.value.trim() !== "" &&
+        lastRef.current.value.trim() !== "" &&
+        displayRef.current.value.trim() !== "" &&
+        stageRef.current.value.trim() !== "" &&
+        birthdayRef.current.value !== ""
       ) {
         //Then Add or update document in firestore
         //Only required fields are needed if empty on non-required field
         //will leave blank value
         await setDoc(doc(db, "user", currentUser.uid), {
           user_fields: {
-            displayname: userData.displayname,
-            legalfirstname: userData.firstname,
-            legallastname: userData.lastname,
-            stagename: userData.stagename,
+            displayname: displayRef.current.value,
+            legalfirstname: firstRef.current.value,
+            legallastname: lastRef.current.value,
+            stagename: stageRef.current.value,
             email: currentUser.email,
             hasavatar: hasAvatar,
-            birthday: userData.birthday,
+            birthday: birthdayRef.current.value,
           },
           address: {
-            street: userData.street,
-            unit: userData.unit,
-            city: userData.city,
-            state: userData.state,
-            country: userData.country,
-            postalcode: userData.postalcode,
+            street: streetRef.current.value,
+            unit: unitRef.current.value,
+            city: cityRef.current.value,
+            state: stateRef.current.value,
+            country: countryRef.current.value,
+            postalcode: postalRef.current.value,
           },
           phone: {
-            countrycode: userData.countrycode,
-            number: userData.number,
+            countrycode: codeRef.current.value,
+            number: numberRef.current.value,
           },
           productioncompaniesowned: [],
           productionsowned: [],
@@ -132,13 +153,16 @@ export default function EditUser() {
           msg: "Account Edited/Updated",
           key: Math.random(),
         });
-        console.log("Edit Profile Submit");
+
+        window.location.reload(true);
       } else if (
-        userData.firstname === "" ||
-        userData.lastname === "" ||
-        userData.displayname === "" ||
-        userData.stagename === ""
+        firstRef.current.value === "" ||
+        lastRef.current.value === "" ||
+        displayRef.current.value === "" ||
+        stageRef.current.value === "" ||
+        birthdayRef.current.value === ""
       ) {
+        setError({ fields: true });
         //when user required field is empty
         setStatusBase({
           lvl: "error",
@@ -146,6 +170,7 @@ export default function EditUser() {
           key: Math.random(),
         });
       } else {
+        setError({ name: true });
         //set the Alert to error and display message
         setStatusBase({
           lvl: "error",
@@ -153,8 +178,8 @@ export default function EditUser() {
           key: Math.random(),
         });
       }
-    } catch {
-      //something went wrong
+    } catch (err) {
+      console.log(err);
       setStatusBase({
         lvl: "error",
         msg: "Failed to edit account.",
@@ -235,7 +260,6 @@ export default function EditUser() {
 
   return (
     <form>
-      <Header />
       {!loading ? (
         <Grid>
           {/*==================Avatar Picture Section==================*/}
@@ -301,39 +325,25 @@ export default function EditUser() {
           >
             <Grid item xs={11} sm={8} md={3}>
               <TextField
-                error={userData.displayname === ""}
-                name="displayname"
-                value={userData.displayname}
-                helperText={userData.displayname === "" ? "Required" : " "}
+                error={error.fields}
+                defaultValue={userData.displayname}
+                inputRef={displayRef}
                 label="User Display Name*"
                 id="outlined-required"
                 type="text"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
                 sx={{ width: "100%" }}
               />
             </Grid>
             <Grid item xs={11} sm={8} md={3}>
               <TextField
                 label="Stage Name*"
-                name="stagename"
-                error={userData.stagename === ""}
-                value={userData.stagename}
-                helperText={userData.stagename === "" ? "Required" : " "}
+                defaultValue={userData.stagename}
+                error={error.fields}
+                inputRef={stageRef}
                 id="outlined-required"
                 type="text"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
                 sx={{ width: "100%" }}
               />
             </Grid>
@@ -351,36 +361,22 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={3}>
               <TextField
                 label="First Name*"
-                name="firstname"
-                error={userData.firstname === ""}
-                helperText={userData.firstname === "" ? "Required" : " "}
+                defaultValue={userData.firstname}
+                error={error.name || error.fields}
                 type="text"
                 variant="outlined"
-                value={userData.firstname}
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
+                inputRef={firstRef}
                 sx={{ width: "100%" }}
               />
             </Grid>
             <Grid item xs={11} sm={8} md={3}>
               <TextField
                 label="Last Name*"
-                name="lastname"
-                error={userData.lastname === ""}
-                helperText={userData.lastname === "" ? "Required" : " "}
+                defaultValue={userData.lastname}
+                error={error.name || error.fields}
                 type="text"
                 variant="outlined"
-                value={userData.lastname}
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
+                inputRef={lastRef}
                 sx={{ width: "100%" }}
               />
             </Grid>
@@ -417,20 +413,14 @@ export default function EditUser() {
             </Grid>
             <Grid item xs={11} sm={8} md={2}>
               <TextField
+                error={error.fields}
                 label="Birthday*"
                 name="birthday"
-                value={userData.birthday}
-                error={userData.birthday === ""}
-                helperText={userData.birthday === "" ? "Required" : ""}
                 InputLabelProps={{ shrink: true }}
+                defaultValue={userData.birthday}
                 type="date"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
+                inputRef={birthdayRef}
                 sx={{ width: "100%" }}
               />
             </Grid>
@@ -462,32 +452,20 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={2} textAlign="center">
               <TextField
                 label="Country Code"
-                name="countrycode"
-                value={userData.countrycode}
+                defaultValue={userData.countrycode}
+                inputRef={codeRef}
                 type="text"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
                 sx={{ width: 1 }}
               />
             </Grid>
             <Grid item xs={11} sm={8} md={4} textAlign="center">
               <TextField
                 label="Phone number"
-                name="number"
-                value={userData.number}
+                defaultValue={userData.number}
+                inputRef={numberRef}
                 type="tel"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
                 sx={{ width: 1 }}
               />
             </Grid>
@@ -505,16 +483,10 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={6} textAlign="center">
               <TextField
                 label="Country"
-                name="country"
-                value={userData.country}
+                defaultValue={userData.country}
+                inputRef={countryRef}
                 type="text"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
                 sx={{ width: 1 }}
               />
             </Grid>
@@ -532,32 +504,20 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={3} textAlign="right">
               <TextField
                 label="City"
-                name="city"
-                value={userData.city}
+                defaultValue={userData.city}
+                inputRef={cityRef}
                 type="text"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
                 sx={{ width: "100%" }}
               />
             </Grid>
             <Grid item xs={11} sm={8} md={3}>
               <TextField
                 label="State"
-                name="state"
-                value={userData.state}
+                defaultValue={userData.state}
+                inputRef={stateRef}
                 type="text"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
                 sx={{ width: "100%" }}
               />
             </Grid>
@@ -575,48 +535,30 @@ export default function EditUser() {
             <Grid item xs={11} sm={8} md={2}>
               <TextField
                 label="Postal Code"
-                name="postalcode"
-                value={userData.postalcode}
+                defaultValue={userData.postalcode}
+                inputRef={postalRef}
                 type="text"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
                 sx={{ width: "100%" }}
               />
             </Grid>
             <Grid item xs={11} sm={8} md={2}>
               <TextField
                 label="Street"
-                name="street"
-                value={userData.street}
+                defaultValue={userData.street}
+                inputRef={streetRef}
                 type="text"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
                 sx={{ width: "100%" }}
               />
             </Grid>
             <Grid item xs={11} sm={8} md={2}>
               <TextField
                 label="Unit"
-                name="unit"
-                value={userData.unit}
+                defaultValue={userData.unit}
+                inputRef={unitRef}
                 type="text"
                 variant="outlined"
-                onChange={(e) => {
-                  setUserData({
-                    ...userData,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
                 sx={{ width: 1 }}
               />
             </Grid>

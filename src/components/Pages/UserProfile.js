@@ -8,7 +8,6 @@ import {
   ButtonGroup,
   Card,
 } from "@mui/material";
-import Header from "../Tools&Hooks/Header";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
 import { db, storage } from "../../firebase";
@@ -120,156 +119,171 @@ export default function UserProfile() {
 
   return (
     <div>
-      <Header />
-      <Card elevation={10} align="center" variant="outlined" style={cardStyle}>
-        <Grid
-          container
-          spacing={1}
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          marginBottom={2}
-        >
-          <Grid item>
-            <Avatar
-              sx={{ width: 150, height: 150 }}
-              src={url}
-              alt="ProfilePic"
-            />
-          </Grid>
-        </Grid>
-        <Grid
-          container
-          columnSpacing={1}
-          rowSpacing={1}
-          direction="row"
-          justifyContent="center"
-          marginBottom={1}
-        >
-          <Grid item xs={11} sm={8} md={6} textAlign="center">
-            <h2>{userData.displayname}</h2>
-          </Grid>
-        </Grid>
-      </Card>
-      <Card elevation={10} align="center" variant="outlined" style={cardStyle2}>
-        <Grid container direction="row">
-          <Grid item xs={3} sm={2} md={0}>
-            <ButtonGroup variant="text" aria-label="text button group">
-              <Button onClick={handleProfile}>About</Button>
-              <Button onClick={handleProfile}>Details</Button>
-            </ButtonGroup>
-          </Grid>
-        </Grid>
-        <Divider />
-        {profile ? (
-          <>
+      {!loading ? (
+        <>
+          <Card
+            elevation={10}
+            align="center"
+            variant="outlined"
+            style={cardStyle}
+          >
             <Grid
               container
-              columnSpacing={12}
-              rowSpacing={0}
+              spacing={1}
               direction="row"
               justifyContent="center"
               alignItems="center"
-              marginBottom={1}
+              marginBottom={2}
             >
-              <ThemeProvider theme={theme}>
-                <Grid item md={12}>
-                  <Typography variant="body1">
-                    <b>Stage Name: </b> {userData.stagename}
-                  </Typography>
-                </Grid>
-              </ThemeProvider>
+              <Grid item>
+                <Avatar
+                  sx={{ width: 150, height: 150 }}
+                  src={url}
+                  alt="ProfilePic"
+                />
+              </Grid>
             </Grid>
             <Grid
               container
-              columnSpacing={12}
-              rowSpacing={0}
+              columnSpacing={1}
+              rowSpacing={1}
               direction="row"
               justifyContent="center"
-              alignItems="center"
               marginBottom={1}
             >
-              <ThemeProvider theme={theme}>
-                <Grid item md={4}>
-                  <Typography variant="body1">
-                    <b>First Name: </b> {userData.firstname}
-                  </Typography>
-                </Grid>
-                <Grid item md={4}>
-                  <Typography variant="body1">
-                    <b>lastname: </b> {userData.lastname}
-                  </Typography>
-                </Grid>
-              </ThemeProvider>
+              <Grid item xs={11} sm={8} md={6} textAlign="center">
+                <h2>{userData.displayname}</h2>
+              </Grid>
             </Grid>
-          </>
-        ) : (
-          <>
-            <Grid
-              container
-              columnSpacing={12}
-              rowSpacing={0}
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              marginBottom={1}
-            >
-              <ThemeProvider theme={theme}>
-                <Grid item md={4}>
-                  <Typography variant="body1">
-                    <b>Email: </b> {currentUser.email}
-                  </Typography>
-                </Grid>
-                <Grid item md={4}>
-                  <Typography variant="body1">
-                    <b>Birthday: </b> {userData.birthday}
-                  </Typography>
-                </Grid>
-              </ThemeProvider>
+          </Card>
+          <Card
+            elevation={10}
+            align="center"
+            variant="outlined"
+            style={cardStyle2}
+          >
+            <Grid container direction="row">
+              <Grid item xs={3} sm={2} md={0}>
+                <ButtonGroup variant="text" aria-label="text button group">
+                  <Button onClick={handleProfile}>About</Button>
+                  <Button onClick={handleProfile}>Details</Button>
+                </ButtonGroup>
+              </Grid>
             </Grid>
-            <Grid
-              container
-              columnSpacing={12}
-              rowSpacing={0}
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              marginBottom={1}
-            >
-              <ThemeProvider theme={theme}>
-                <Grid item md={4}>
-                  <Typography variant="body1">
-                    <b>Country Code: </b> {userData.countrycode}
-                  </Typography>
+            <Divider />
+            {profile ? (
+              <>
+                <Grid
+                  container
+                  columnSpacing={12}
+                  rowSpacing={0}
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  marginBottom={1}
+                >
+                  <ThemeProvider theme={theme}>
+                    <Grid item md={12}>
+                      <Typography variant="body1">
+                        <b>Stage Name: </b> {userData.stagename}
+                      </Typography>
+                    </Grid>
+                  </ThemeProvider>
                 </Grid>
-                <Grid item md={4}>
-                  <Typography variant="body1">
-                    <b>number: </b> {userData.number}
-                  </Typography>
+                <Grid
+                  container
+                  columnSpacing={12}
+                  rowSpacing={0}
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  marginBottom={1}
+                >
+                  <ThemeProvider theme={theme}>
+                    <Grid item md={4}>
+                      <Typography variant="body1">
+                        <b>First Name: </b> {userData.firstname}
+                      </Typography>
+                    </Grid>
+                    <Grid item md={4}>
+                      <Typography variant="body1">
+                        <b>lastname: </b> {userData.lastname}
+                      </Typography>
+                    </Grid>
+                  </ThemeProvider>
                 </Grid>
-              </ThemeProvider>
-            </Grid>
-            <Grid
-              container
-              columnSpacing={12}
-              rowSpacing={0}
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              marginBottom={1}
-            >
-              <ThemeProvider theme={theme}>
-                <Grid item md={12}>
-                  <Typography variant="body1">
-                    <b>Address: </b>{" "}
-                    {`${userData.country} , ${userData.postalcode} , ${userData.state} , ${userData.city} , ${userData.street} , ${userData.unit}`}
-                  </Typography>
+              </>
+            ) : (
+              <>
+                <Grid
+                  container
+                  columnSpacing={12}
+                  rowSpacing={0}
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  marginBottom={1}
+                >
+                  <ThemeProvider theme={theme}>
+                    <Grid item md={4}>
+                      <Typography variant="body1">
+                        <b>Email: </b> {currentUser.email}
+                      </Typography>
+                    </Grid>
+                    <Grid item md={4}>
+                      <Typography variant="body1">
+                        <b>Birthday: </b> {userData.birthday}
+                      </Typography>
+                    </Grid>
+                  </ThemeProvider>
                 </Grid>
-              </ThemeProvider>
-            </Grid>
-          </>
-        )}
-      </Card>
+                <Grid
+                  container
+                  columnSpacing={12}
+                  rowSpacing={0}
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  marginBottom={1}
+                >
+                  <ThemeProvider theme={theme}>
+                    <Grid item md={4}>
+                      <Typography variant="body1">
+                        <b>Country Code: </b> {userData.countrycode}
+                      </Typography>
+                    </Grid>
+                    <Grid item md={4}>
+                      <Typography variant="body1">
+                        <b>number: </b> {userData.number}
+                      </Typography>
+                    </Grid>
+                  </ThemeProvider>
+                </Grid>
+                <Grid
+                  container
+                  columnSpacing={12}
+                  rowSpacing={0}
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  marginBottom={1}
+                >
+                  <ThemeProvider theme={theme}>
+                    <Grid item md={12}>
+                      <Typography variant="body1">
+                        <b>Address: </b>{" "}
+                        {`${userData.country} , ${userData.postalcode} , ${userData.state} , ${userData.city} , ${userData.street} , ${userData.unit}`}
+                      </Typography>
+                    </Grid>
+                  </ThemeProvider>
+                </Grid>
+              </>
+            )}
+          </Card>
+        </>
+      ) : (
+        "loading..."
+      )}
     </div>
   );
 }

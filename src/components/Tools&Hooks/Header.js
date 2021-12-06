@@ -106,12 +106,15 @@ export default function Header() {
 
   const handleEditProfile = () => {
     navigate("/edit-profile");
+    setOpen(false);
   };
   const handleProductList = () => {
     navigate("/production-list");
+    setOpen(false);
   };
   const handleProducerPage = () => {
     navigate("/producer-page");
+    setOpen(false);
   };
   async function hanedleLogout() {
     setError("");

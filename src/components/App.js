@@ -15,10 +15,13 @@ import ProductionCompanyProfileCreate from "./Pages/ProductionCompanyProfileCrea
 import ProductionCompanyProfileEdit from "./Pages/ProductionCompanyProfileEdit";
 import ProductionProfileCreate from "./Pages/ProductionProfileCreate";
 import ProductionCompanyDashboard from "./Pages/ProductionCompanyDashboard";
-
+import ProductionCompanyProfileView from "./Pages/ProductionCompanyProfileView";
+import ProductionDashboard from "./Pages/ProductionDashboard";
+//import Header from "./Tools&Hooks/Header";
 function App() {
   //this is so that I can pass data between components
   const [productionCompany, setProductionCompany] = useState("");
+  const [productionId, setProductionId] = useState("");
 
   return (
     <Container>
@@ -50,18 +53,33 @@ function App() {
                 }
               />
               <Route
-                path="/Production-profile-create"
+                path="/production-profile-create"
                 exact
                 element={
                   <ProductionProfileCreate companyId={productionCompany} />
                 }
               />
               <Route
-                path="/Production-company-dashboard"
+                path="/production-company-dashboard"
                 exact
                 element={
-                  <ProductionCompanyDashboard companyId={productionCompany} />
+                  <ProductionCompanyDashboard
+                    companyId={productionCompany}
+                    setProductionId={setProductionId}
+                  />
                 }
+              />
+              <Route
+                path="/production-company-profile"
+                exact
+                element={
+                  <ProductionCompanyProfileView companyId={productionCompany} />
+                }
+              />
+              <Route
+                path="/production-dashboard"
+                exact
+                element={<ProductionDashboard productionId={productionId} />}
               />
             </Route>
           </Routes>

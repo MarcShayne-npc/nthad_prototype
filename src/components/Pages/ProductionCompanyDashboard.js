@@ -1,6 +1,5 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import Header from "../Tools&Hooks/Header";
 import { Button, Grid, Card } from "@mui/material";
 import {
   doc,
@@ -18,7 +17,10 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TreeItem from "@mui/lab/TreeItem";
 
-export default function ProductionCompanyDashboard({ companyId }) {
+export default function ProductionCompanyDashboard({
+  companyId,
+  setProductionId,
+}) {
   const { currentUser } = useAuth();
   const userUid = currentUser.uid;
   const navigate = useNavigate();
@@ -26,27 +28,33 @@ export default function ProductionCompanyDashboard({ companyId }) {
   const [companyData, setCompanyData] = useState({
     name: "",
   });
-  const [data2, setData2] = useState({
+  const [data, setData] = useState({
     id: "root",
     name: "Production Owned",
     children: [{ id: "1", name: "Produtions Name" }],
   });
+  const [productionOwned, setproductionOwned] = useState([]);
+
   useEffect(() => {
     const getProductionCompany = async () => {
       setLoading(true);
-      //get Document reference from firebase by using current user uid
-      //if the owners field contains user uid
+
+      //gets all the production owned by the user to use later
+      const q = doc(db, "user", userUid);
+      await getDoc(q).then((res) => {
+        setproductionOwned(res.data().productionsowned);
+      });
+
+      //get user data later used to check if user ownes that production
       const q2 = query(
         collection(db, "production"),
-        where("owners", "array-contains", userUid)
+        where("productioncompanyid", "==", companyId)
       );
       const querySnapshot2 = await getDocs(q2);
-      //this variables are for productions
       let arr2 = [];
       let n = 0;
-      //For each company the user owned will add to children property of Data
+      //For each production the company owns add to children property of Data
       //also adds a Id with each children incrementing
-
       querySnapshot2.forEach((doc) => {
         arr2.push({
           id: (n + 1).toString(),
@@ -54,11 +62,8 @@ export default function ProductionCompanyDashboard({ companyId }) {
           docId: doc.id,
         });
         n++;
-        console.log(doc.id, " => ", doc.data());
       });
-      //sets the Data for all the array elements in arry
-
-      setData2({
+      setData({
         id: "root",
         name: "Production Owned",
         children: arr2,
@@ -68,7 +73,7 @@ export default function ProductionCompanyDashboard({ companyId }) {
     };
 
     getProductionCompany();
-  }, [userUid]);
+  }, [companyId, userUid]);
 
   //Mui dynamic rending for Treeitems Read more on https://mui.com/components/tree-view/#main-content
   const renderTree = (nodes) => (
@@ -82,7 +87,7 @@ export default function ProductionCompanyDashboard({ companyId }) {
   useEffect(() => {
     const getUsers = async () => {
       setLoading(true);
-      console.log(companyId);
+
       try {
         const docRef = doc(db, "productioncompany", companyId);
         await getDoc(docRef).then((res) => {
@@ -103,12 +108,22 @@ export default function ProductionCompanyDashboard({ companyId }) {
   };
 
   const handleCreateProduction = () => {
-    navigate("/Production-profile-create");
+    navigate("/production-profile-create");
   };
+
+  const handleProfileView = () => {
+    navigate("/production-company-profile");
+  };
+
+  function action(event, nodeId) {
+    if (productionOwned.includes(data.children[nodeId - 1].docId)) {
+      setProductionId(data.children[nodeId - 1].docId);
+      navigate("/production-dashboard");
+    }
+  }
 
   return (
     <div>
-      <Header />
       {!loading ? (
         <Grid>
           <Grid
@@ -123,7 +138,9 @@ export default function ProductionCompanyDashboard({ companyId }) {
           </Grid>
           <Grid container direction="row" marginBottom={1}>
             <Grid item xs={12} textAlign="center">
-              <Button variant="outlined">View Profile</Button>
+              <Button variant="outlined" onClick={handleProfileView}>
+                View Profile
+              </Button>
 
               <Button variant="outlined" onClick={handleEditProfile}>
                 Edit Profile
@@ -138,7 +155,7 @@ export default function ProductionCompanyDashboard({ companyId }) {
           >
             <Grid item xs={12} md={4}>
               <Card
-                elevation={10}
+                elevation={0}
                 align="center"
                 variant="outlined"
                 style={{ padding: 20 }}
@@ -154,8 +171,9 @@ export default function ProductionCompanyDashboard({ companyId }) {
                     maxWidth: 400,
                     overflowY: "auto",
                   }}
+                  onNodeSelect={action}
                 >
-                  {renderTree(data2)}
+                  {renderTree(data)}
                 </TreeView>
               </Card>
             </Grid>

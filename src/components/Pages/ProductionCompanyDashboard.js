@@ -20,6 +20,7 @@ import TreeItem from "@mui/lab/TreeItem";
 export default function ProductionCompanyDashboard({
   companyId,
   setProductionId,
+  setProductionCompany,
 }) {
   const { currentUser } = useAuth();
   const userUid = currentUser.uid;
@@ -31,9 +32,11 @@ export default function ProductionCompanyDashboard({
   const [data, setData] = useState({
     id: "root",
     name: "Production Owned",
+    docId: "",
     children: [{ id: "1", name: "Produtions Name" }],
   });
   const [productionOwned, setproductionOwned] = useState([]);
+  const [proCoId, setProCoId] = useState("");
 
   useEffect(() => {
     const getProductionCompany = async () => {
@@ -50,6 +53,7 @@ export default function ProductionCompanyDashboard({
         collection(db, "production"),
         where("productioncompanyid", "==", companyId)
       );
+      setProCoId(companyId);
       const querySnapshot2 = await getDocs(q2);
       let arr2 = [];
       let n = 0;
@@ -112,6 +116,7 @@ export default function ProductionCompanyDashboard({
   };
 
   const handleProfileView = () => {
+    setProductionCompany(proCoId);
     navigate("/production-company-profile");
   };
 
@@ -119,6 +124,10 @@ export default function ProductionCompanyDashboard({
     if (productionOwned.includes(data.children[nodeId - 1].docId)) {
       setProductionId(data.children[nodeId - 1].docId);
       navigate("/production-dashboard");
+    } else {
+      setProductionCompany(proCoId);
+      setProductionId(data.children[nodeId - 1].docId);
+      navigate("/production-profile-view");
     }
   }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Grid, TextField } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
@@ -11,6 +11,7 @@ import {
   doc,
   updateDoc,
   arrayUnion,
+  getDoc,
 } from "firebase/firestore";
 import AlertMessage from "../Tools&Hooks/AlertMessage";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +27,28 @@ export default function ProductionProfileCreate({ companyId }) {
   const autoRef = useRef();
   const aboutRef = useRef();
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [companyData, setCompanyData] = useState({
+    name: "",
+  });
+  useEffect(() => {
+    const getUsers = async () => {
+      setLoading(true);
+
+      try {
+        const docRef = doc(db, "productioncompany", companyId);
+        await getDoc(docRef).then((res) => {
+          setCompanyData({
+            name: res.data().name,
+          });
+        });
+      } catch {
+        navigate("/producer-page");
+      }
+      setLoading(false);
+    };
+    getUsers();
+  }, [companyId, navigate]);
 
   //When user press submit button
   const handleEditUser = async () => {
@@ -101,9 +124,13 @@ export default function ProductionProfileCreate({ companyId }) {
           alignItems="center"
           marginBottom={1}
         >
-          <Grid item xs={11} sm={8} md={6}>
-            <h2>Create Production for [{companyId}]</h2>
-          </Grid>
+          {!loading ? (
+            <Grid item xs={11} sm={8} md={6}>
+              <h2>Create Production for {companyData.name}</h2>
+            </Grid>
+          ) : (
+            "loading..."
+          )}
         </Grid>
         {/*==================Name & short Name Section==================*/}
         <Grid

@@ -10,7 +10,10 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TreeItem from "@mui/lab/TreeItem";
 
-export default function ProducerPage({ setProductionCompany }) {
+export default function ProducerPage({
+  setProductionCompany,
+  setProductionId,
+}) {
   //current user that is logged in
   const { currentUser } = useAuth();
   const userUid = currentUser.uid;
@@ -21,23 +24,30 @@ export default function ProducerPage({ setProductionCompany }) {
     name: "Production Company Owned",
     children: [{ id: "1", name: "Company Name", docId: "" }],
   });
-  const [data2, setData2] = useState({
-    id: "root2",
-    name: "Production Owned",
-    children: [
-      {
-        id: "Parent 1",
-        name: "Produtions Company",
-        proCoId: "",
-        children: [
-          {
-            id: "2",
-            name: "Production",
-            proId: "",
-          },
-        ],
-      },
-    ],
+  //for both production and company
+  // const [data2, setData2] = useState({
+  //   id: "root2",
+  //   name: "Production Owned",
+  //   children: [
+  //     {
+  //       id: "Parent 1",
+  //       name: "Produtions Company",
+  //       proCoId: "",
+  //       children: [
+  //         {
+  //           id: "2",
+  //           name: "Production",
+  //           proId: "",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  // });
+  //for prodution
+  const [data3, setData3] = useState({
+    id: "root",
+    name: "Production Company Owned",
+    children: [{ id: "1", name: "Company Name", docId: "" }],
   });
   const [loading, setLoading] = useState(true);
 
@@ -80,31 +90,31 @@ export default function ProducerPage({ setProductionCompany }) {
         n++;
       });
       //arr to fuse both production and production company
-      let arr3 = [];
-      let y = 0;
+      //let arr3 = [];
+      //let y = 0;
       querySnapshot.forEach((doc) => {
-        const found = arr4.some((r) => doc.data().productions.includes(r));
-        if (found) {
-          arr3.push({
-            id: "parent " + y.toString(),
-            name: doc.data().name,
-            proCoId: doc.id,
-            children: arr2,
-          });
-        } else {
-          arr3.push({
-            id: "parent " + y.toString(),
-            name: doc.data().name,
-            proCoId: doc.id,
-          });
-        }
+        // const found = arr4.some((r) => doc.data().productions.includes(r));
+        // if (found) {
+        //   arr3.push({
+        //     id: "parent " + y.toString(),
+        //     name: doc.data().name,
+        //     proCoId: doc.id,
+        //     children: arr2,
+        //   });
+        // } else {
+        //   arr3.push({
+        //     id: "parent " + y.toString(),
+        //     name: doc.data().name,
+        //     proCoId: doc.id,
+        //   });
+        // }
         arr.push({
           id: (i + 1).toString(),
           name: doc.data().name,
           docId: doc.id,
         });
         i++;
-        y++;
+        //y++;
       });
 
       //sets the Data for all the array elements in arry
@@ -113,10 +123,15 @@ export default function ProducerPage({ setProductionCompany }) {
         name: "Production Company Owned",
         children: arr,
       });
-      setData2({
+      // setData2({
+      //   id: "root2",
+      //   name: "Production Owned",
+      //   children: arr3,
+      // });
+      setData3({
         id: "root2",
         name: "Production Owned",
-        children: arr3,
+        children: arr2,
       });
       //When all is done set loading to false
       setLoading(false);
@@ -147,10 +162,11 @@ export default function ProducerPage({ setProductionCompany }) {
   }
   function action2(event, nodeId) {
     console.log("nodeId: ", nodeId);
-    // if (nodeId !== "root") {
-    //   const x = JSON.parse(nodeId) - 1;
-    //   console.log(data2.children[x].name);
-    // }
+    const x = JSON.parse(nodeId) - 1;
+    if (nodeId !== "root2") {
+      setProductionId(data3.children[x].proId);
+      navigate("/production-dashboard");
+    }
   }
   const handleProductionCompanyProfileCreate = () => {
     navigate("/production-company-profile-create");
@@ -182,7 +198,7 @@ export default function ProducerPage({ setProductionCompany }) {
             sx={{ height: 200, flexGrow: 1, maxWidth: 400, overflowY: "auto" }}
             onNodeSelect={action2}
           >
-            {renderTree(data2)}
+            {renderTree(data3)}
           </TreeView>
         </>
       ) : (

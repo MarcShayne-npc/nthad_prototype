@@ -8,7 +8,6 @@ import {
   ButtonGroup,
   Card,
 } from "@mui/material";
-import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
 import { db, storage } from "../../firebase";
 import { getDoc, doc } from "firebase/firestore";
@@ -34,10 +33,8 @@ const cardStyle2 = {
   margin: "20px auto",
 };
 
-export default function UserProfile() {
+export default function UserProfile({ userId }) {
   const [loading, setLoading] = useState(true);
-  const { currentUser } = useAuth();
-  const documentId = currentUser.uid;
 
   const [userData, setUserData] = useState({
     displayname: "",
@@ -45,6 +42,7 @@ export default function UserProfile() {
     firstname: "",
     lastname: "",
     birthday: "2017-05-24",
+    email: "",
     city: "",
     country: "",
     postalcode: "",
@@ -59,7 +57,7 @@ export default function UserProfile() {
     const getUsers = async () => {
       setLoading(true);
       //get Document reference from firebase by using current user uid
-      const docRef = doc(db, "user", documentId);
+      const docRef = doc(db, "user", userId);
       //asynchronous get date from firebase then set's their data in a useState
       await getDoc(docRef)
         .then((res) => {
@@ -69,6 +67,7 @@ export default function UserProfile() {
             firstname: res.data().user_fields.legalfirstname,
             lastname: res.data().user_fields.legallastname,
             birthday: res.data().user_fields.birthday,
+            email: res.data().user_fields.email,
             city: res.data().address.city,
             country: res.data().address.country,
             postalcode: res.data().address.postalcode,
@@ -88,7 +87,7 @@ export default function UserProfile() {
     getUsers();
 
     return setUserData({});
-  }, [documentId]);
+  }, [userId]);
 
   //sets the url image to update Avatar
   const [url, setUrl] = useState("");
@@ -99,7 +98,7 @@ export default function UserProfile() {
   useEffect(() => {
     if (hasAvatar === true) {
       const getImage = async () => {
-        const imageRef = ref(storage, `user/avatar/${documentId}`);
+        const imageRef = ref(storage, `user/avatar/${userId}`);
         setUrl(await getDownloadURL(imageRef));
       };
       getImage();
@@ -227,7 +226,7 @@ export default function UserProfile() {
                   <ThemeProvider theme={theme}>
                     <Grid item md={4}>
                       <Typography variant="body1">
-                        <b>Email: </b> {currentUser.email}
+                        <b>Email: </b> {userData.email}
                       </Typography>
                     </Grid>
                     <Grid item md={4}>

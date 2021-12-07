@@ -17,11 +17,14 @@ import ProductionProfileCreate from "./Pages/ProductionProfileCreate";
 import ProductionCompanyDashboard from "./Pages/ProductionCompanyDashboard";
 import ProductionCompanyProfileView from "./Pages/ProductionCompanyProfileView";
 import ProductionDashboard from "./Pages/ProductionDashboard";
-//import Header from "./Tools&Hooks/Header";
+import ProductionProfileEdit from "./Pages/ProductionProfileEdit";
+import ProductionProfileView from "./Pages/ProductionProfileView";
+
 function App() {
   //this is so that I can pass data between components
   const [productionCompany, setProductionCompany] = useState("");
   const [productionId, setProductionId] = useState("");
+  const [userId, setUserId] = useState("");
 
   return (
     <Container>
@@ -37,10 +40,16 @@ function App() {
               <Route
                 path="/producer-page"
                 element={
-                  <ProducerPage setProductionCompany={setProductionCompany} />
+                  <ProducerPage
+                    setProductionCompany={setProductionCompany}
+                    setProductionId={setProductionId}
+                  />
                 }
               />
-              <Route path="/user-profile" element={<UserProfile />} />
+              <Route
+                path="/user-profile"
+                element={<UserProfile userId={userId} />}
+              />
               <Route
                 path="/production-company-profile-create"
                 element={<ProductionCompanyProfileCreate />}
@@ -65,6 +74,7 @@ function App() {
                 element={
                   <ProductionCompanyDashboard
                     companyId={productionCompany}
+                    setProductionCompany={setProductionCompany}
                     setProductionId={setProductionId}
                   />
                 }
@@ -79,7 +89,34 @@ function App() {
               <Route
                 path="/production-dashboard"
                 exact
-                element={<ProductionDashboard productionId={productionId} />}
+                element={
+                  <ProductionDashboard
+                    productionId={productionId}
+                    setProductionCompany={setProductionCompany}
+                  />
+                }
+              />
+              <Route
+                path="/production-profile-edit"
+                exact
+                element={
+                  <ProductionProfileEdit
+                    productionId={productionId}
+                    companyId={productionCompany}
+                  />
+                }
+              />
+              <Route
+                path="/production-profile-view"
+                exact
+                element={
+                  <ProductionProfileView
+                    productionId={productionId}
+                    companyId={productionCompany}
+                    setUserId={setUserId}
+                    setProductionCompany={setProductionCompany}
+                  />
+                }
               />
             </Route>
           </Routes>

@@ -83,7 +83,7 @@ export default function ProductionCompanyProfileView({ companyId }) {
     <div>
       {!loading ? (
         <Card
-          elevation={10}
+          elevation={0}
           align="center"
           variant="outlined"
           style={cardStyle2}

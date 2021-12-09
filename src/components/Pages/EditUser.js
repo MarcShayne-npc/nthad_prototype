@@ -107,85 +107,178 @@ export default function EditUser() {
   const handleEditUser = async () => {
     //regex this is used later to detech letter or space only
     const re = /^[a-zA-Z\s]*$/;
-    try {
-      setError({ fields: false, name: false });
-      //Checks if userData.firstname & .lastname is letters and space only
-      if (
-        re.test(firstRef.current.value) &&
-        re.test(lastRef.current.value) &&
-        firstRef.current.value.trim() !== "" &&
-        lastRef.current.value.trim() !== "" &&
-        displayRef.current.value.trim() !== "" &&
-        stageRef.current.value.trim() !== "" &&
-        birthdayRef.current.value !== ""
-      ) {
-        //Then Add or update document in firestore
-        //Only required fields are needed if empty on non-required field
-        //will leave blank value
-        await setDoc(doc(db, "user", currentUser.uid), {
-          user_fields: {
-            displayname: displayRef.current.value,
-            legalfirstname: firstRef.current.value,
-            legallastname: lastRef.current.value,
-            stagename: stageRef.current.value,
-            email: currentUser.email,
-            hasavatar: hasAvatar,
-            birthday: birthdayRef.current.value,
-          },
-          address: {
-            street: streetRef.current.value,
-            unit: unitRef.current.value,
-            city: cityRef.current.value,
-            state: stateRef.current.value,
-            country: countryRef.current.value,
-            postalcode: postalRef.current.value,
-          },
-          phone: {
-            countrycode: codeRef.current.value,
-            number: numberRef.current.value,
-          },
-          productioncompaniesowned: [],
-          productionsowned: [],
-        });
-        //set the Alert to Success and display message
-        setStatusBase({
-          lvl: "success",
-          msg: "Account Edited/Updated",
-          key: Math.random(),
-        });
+    //this is to check if the document exist in the firestore
+    const usersRef = doc(db, "user", currentUser.uid);
+    const docSnap = await getDoc(usersRef);
+    //if it exists already make update
+    if (docSnap.exists()) {
+      try {
+        setError({ fields: false, name: false });
+        //Checks if userData.firstname & .lastname is letters and space only
+        if (
+          re.test(firstRef.current.value) &&
+          re.test(lastRef.current.value) &&
+          firstRef.current.value.trim() !== "" &&
+          lastRef.current.value.trim() !== "" &&
+          displayRef.current.value.trim() !== "" &&
+          stageRef.current.value.trim() !== "" &&
+          birthdayRef.current.value !== ""
+        ) {
+          //Then Add or update document in firestore
+          //Only required fields are needed if empty on non-required field
+          //will leave blank value
+          await updateDoc(doc(db, "user", currentUser.uid), {
+            user_fields: {
+              displayname: displayRef.current.value,
+              legalfirstname: firstRef.current.value,
+              legallastname: lastRef.current.value,
+              stagename: stageRef.current.value,
+              email: currentUser.email,
+              hasavatar: hasAvatar,
+              birthday: birthdayRef.current.value,
+            },
+            address: {
+              street: streetRef.current.value,
+              unit: unitRef.current.value,
+              city: cityRef.current.value,
+              state: stateRef.current.value,
+              country: countryRef.current.value,
+              postalcode: postalRef.current.value,
+            },
+            phone: {
+              countrycode: codeRef.current.value,
+              number: numberRef.current.value,
+            },
+          });
+          //set the Alert to Success and display message
+          setStatusBase({
+            lvl: "success",
+            msg: "Account Edited/Updated",
+            key: Math.random(),
+          });
 
-        window.location.reload(true);
-      } else if (
-        firstRef.current.value === "" ||
-        lastRef.current.value === "" ||
-        displayRef.current.value === "" ||
-        stageRef.current.value === "" ||
-        birthdayRef.current.value === ""
-      ) {
-        setError({ fields: true });
-        //when user required field is empty
+          window.location.reload(true);
+        } else if (
+          firstRef.current.value === "" ||
+          lastRef.current.value === "" ||
+          displayRef.current.value === "" ||
+          stageRef.current.value === "" ||
+          birthdayRef.current.value === ""
+        ) {
+          setError({ fields: true });
+          //when user required field is empty
+          setStatusBase({
+            lvl: "error",
+            msg: "Required fields are empty",
+            key: Math.random(),
+          });
+        } else {
+          setError({ name: true });
+          //set the Alert to error and display message
+          setStatusBase({
+            lvl: "error",
+            msg: "Only letters allowed in First Name & Last Name",
+            key: Math.random(),
+          });
+        }
+      } catch (err) {
+        console.log(err);
         setStatusBase({
           lvl: "error",
-          msg: "Required fields are empty",
+          msg: "Failed to edit account.",
           key: Math.random(),
         });
-      } else {
-        setError({ name: true });
-        //set the Alert to error and display message
-        setStatusBase({
-          lvl: "error",
-          msg: "Only letters allowed in First Name & Last Name",
-          key: Math.random(),
-        });
+        console.log("Failled to edit account");
       }
-    } catch (err) {
-      console.log(err);
-      setStatusBase({
-        lvl: "error",
-        msg: "Failed to edit account.",
-        key: Math.random(),
-      });
-      console.log("Failled to edit account");
+
+      //if document dosen't exist addDoc
+      //below is the same code as above but instead of updateDoc its setDoc
+      //since user dosen't exist in the database yet
+    } else {
+      try {
+        setError({ fields: false, name: false });
+        //Checks if userData.firstname & .lastname is letters and space only
+        if (
+          re.test(firstRef.current.value) &&
+          re.test(lastRef.current.value) &&
+          firstRef.current.value.trim() !== "" &&
+          lastRef.current.value.trim() !== "" &&
+          displayRef.current.value.trim() !== "" &&
+          stageRef.current.value.trim() !== "" &&
+          birthdayRef.current.value !== ""
+        ) {
+          //Then Add or update document in firestore
+          //Only required fields are needed if empty on non-required field
+          //will leave blank value
+          await setDoc(
+            doc(db, "user", currentUser.uid),
+            {
+              user_fields: {
+                displayname: displayRef.current.value,
+                legalfirstname: firstRef.current.value,
+                legallastname: lastRef.current.value,
+                stagename: stageRef.current.value,
+                email: currentUser.email,
+                hasavatar: hasAvatar,
+                birthday: birthdayRef.current.value,
+              },
+              address: {
+                street: streetRef.current.value,
+                unit: unitRef.current.value,
+                city: cityRef.current.value,
+                state: stateRef.current.value,
+                country: countryRef.current.value,
+                postalcode: postalRef.current.value,
+              },
+              phone: {
+                countrycode: codeRef.current.value,
+                number: numberRef.current.value,
+              },
+              productioncompaniesowned: [],
+              productionsowned: [],
+            },
+            { merge: true }
+          );
+          //set the Alert to Success and display message
+          setStatusBase({
+            lvl: "success",
+            msg: "Account Edited/Updated",
+            key: Math.random(),
+          });
+
+          window.location.reload(true);
+        } else if (
+          firstRef.current.value === "" ||
+          lastRef.current.value === "" ||
+          displayRef.current.value === "" ||
+          stageRef.current.value === "" ||
+          birthdayRef.current.value === ""
+        ) {
+          setError({ fields: true });
+          //when user required field is empty
+          setStatusBase({
+            lvl: "error",
+            msg: "Required fields are empty",
+            key: Math.random(),
+          });
+        } else {
+          setError({ name: true });
+          //set the Alert to error and display message
+          setStatusBase({
+            lvl: "error",
+            msg: "Only letters allowed in First Name & Last Name",
+            key: Math.random(),
+          });
+        }
+      } catch (err) {
+        console.log(err);
+        setStatusBase({
+          lvl: "error",
+          msg: "Failed to edit account.",
+          key: Math.random(),
+        });
+        console.log("Failled to edit account");
+      }
     }
   };
 

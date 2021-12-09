@@ -19,6 +19,7 @@ import ProductionCompanyProfileView from "./Pages/ProductionCompanyProfileView";
 import ProductionDashboard from "./Pages/ProductionDashboard";
 import ProductionProfileEdit from "./Pages/ProductionProfileEdit";
 import ProductionProfileView from "./Pages/ProductionProfileView";
+import ProductionCrewList from "./Pages/ProductionCrewList";
 
 function App() {
   //this is so that I can pass data between components
@@ -92,6 +93,7 @@ function App() {
                 element={
                   <ProductionDashboard
                     productionId={productionId}
+                    setProductionId={setProductionId}
                     setProductionCompany={setProductionCompany}
                   />
                 }
@@ -115,6 +117,16 @@ function App() {
                     companyId={productionCompany}
                     setUserId={setUserId}
                     setProductionCompany={setProductionCompany}
+                  />
+                }
+              />
+              <Route
+                path="/production-crew-list"
+                exact
+                element={
+                  <ProductionCrewList
+                    productionId={productionId}
+                    companyId={productionCompany}
                   />
                 }
               />

@@ -9,6 +9,7 @@ import { Create } from "@mui/icons-material";
 export default function ProductionDashboard({
   productionId,
   setProductionCompany,
+  setProductionId,
 }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -51,7 +52,9 @@ export default function ProductionDashboard({
   };
 
   const handleCrew = () => {
-    //navigate("/production-profile-create");
+    setProductionCompany(companyId);
+    setProductionId(productionId);
+    navigate("/production-crew-list");
   };
   const handleCompanyLink = () => {
     setProductionCompany(companyId);
@@ -68,15 +71,10 @@ export default function ProductionDashboard({
             marginBottom={1}
           >
             <Grid item xs={12} textAlign="center">
-              <Link
-                onClick={handleProductionEdit}
-                style={{ cursor: "pointer" }}
-              >
-                <h1>
-                  {productionData.name}
-                  <Create />
-                </h1>
-              </Link>
+              <h1 onClick={handleProductionEdit} style={{ cursor: "pointer" }}>
+                {productionData.name}
+                <Create />
+              </h1>
             </Grid>
           </Grid>
           <Grid
@@ -87,7 +85,7 @@ export default function ProductionDashboard({
           >
             <Grid item xs={12} textAlign="center">
               <Link onClick={handleCompanyLink} style={{ cursor: "pointer" }}>
-                <h3>{"Company: " + company}</h3>
+                <h3>{company}</h3>
               </Link>
             </Grid>
           </Grid>

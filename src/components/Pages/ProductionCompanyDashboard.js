@@ -69,7 +69,7 @@ export default function ProductionCompanyDashboard({
       });
       setData({
         id: "root",
-        name: "Production Owned",
+        name: "Production",
         children: arr2,
       });
       //When all is done set loading to false
@@ -81,7 +81,16 @@ export default function ProductionCompanyDashboard({
 
   //Mui dynamic rending for Treeitems Read more on https://mui.com/components/tree-view/#main-content
   const renderTree = (nodes) => (
-    <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name}>
+    <TreeItem
+      key={nodes.id}
+      nodeId={nodes.id}
+      label={nodes.name}
+      style={
+        nodes.id.includes("root")
+          ? { backgroundColor: "#5040a0", color: "white" }
+          : { backgroundColor: "white", color: "black" }
+      }
+    >
       {Array.isArray(nodes.children)
         ? nodes.children.map((node) => renderTree(node))
         : null}
@@ -121,12 +130,22 @@ export default function ProductionCompanyDashboard({
   };
 
   function action(event, nodeId) {
-    if (productionOwned.includes(data.children[nodeId - 1].docId)) {
-      setProductionId(data.children[nodeId - 1].docId);
+    let x = "";
+    let y = false;
+    if (!nodeId.includes("root")) {
+      console.log(nodeId);
+      x = JSON.parse(nodeId) - 1;
+      //checks if the Production is owned in the array
+      y = productionOwned.includes(data.children[x].docId);
+    }
+    //if owned then redirect to the production-dashboard
+    if (!nodeId.includes("root") && y) {
+      setProductionId(data.children[x].docId);
       navigate("/production-dashboard");
-    } else {
+      //if not the redirect to production profile view
+    } else if (!nodeId.includes("root")) {
       setProductionCompany(proCoId);
-      setProductionId(data.children[nodeId - 1].docId);
+      setProductionId(data.children[x].docId);
       navigate("/production-profile-view");
     }
   }

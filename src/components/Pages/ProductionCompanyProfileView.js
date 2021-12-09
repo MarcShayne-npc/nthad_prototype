@@ -88,6 +88,21 @@ export default function ProductionCompanyProfileView({ companyId }) {
           variant="outlined"
           style={cardStyle2}
         >
+          <Grid
+            container
+            columnSpacing={12}
+            rowSpacing={0}
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            marginBottom={1}
+          >
+            <ThemeProvider theme={theme}>
+              <Grid item md={12}>
+                <Typography variant="h6">{companyData.name}</Typography>
+              </Grid>
+            </ThemeProvider>
+          </Grid>
           <Grid container direction="row">
             <Grid item xs={3} sm={2} md={0}>
               <ButtonGroup variant="text" aria-label="text button group">
@@ -99,21 +114,6 @@ export default function ProductionCompanyProfileView({ companyId }) {
           <Divider />
           {profile ? (
             <>
-              <Grid
-                container
-                columnSpacing={12}
-                rowSpacing={0}
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-                marginBottom={1}
-              >
-                <ThemeProvider theme={theme}>
-                  <Grid item md={12}>
-                    <Typography variant="h6">{companyData.name}</Typography>
-                  </Grid>
-                </ThemeProvider>
-              </Grid>
               <Grid
                 container
                 columnSpacing={12}

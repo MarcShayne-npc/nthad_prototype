@@ -9,7 +9,7 @@ import {
   collection,
   serverTimestamp,
   doc,
-  updateDoc,
+  setDoc,
   arrayUnion,
 } from "firebase/firestore";
 import AlertMessage from "../Tools&Hooks/AlertMessage";
@@ -73,9 +73,13 @@ export default function ProductionCompanyProfileCreate() {
             productions: [],
           }
         );
-        await updateDoc(doc(db, "user", currentUser.uid), {
-          productioncompaniesowned: arrayUnion(productionCompanyRef.id),
-        });
+        await setDoc(
+          doc(db, "user", currentUser.uid),
+          {
+            productioncompaniesowned: arrayUnion(productionCompanyRef.id),
+          },
+          { merge: true }
+        );
         //set the Alert to Success and display message
         setStatusBase({
           lvl: "success",

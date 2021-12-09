@@ -34,6 +34,14 @@ import MailIcon from "@mui/icons-material/Mail";
 import { getDoc, doc } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { getDownloadURL, ref } from "firebase/storage";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import CorporateFareIcon from "@mui/icons-material/CorporateFare";
+import TheatersIcon from "@mui/icons-material/Theaters";
+import ArticleIcon from "@mui/icons-material/Article";
+import MessageIcon from "@mui/icons-material/Message";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import DeveloperBoardIcon from "@mui/icons-material/DeveloperBoard";
 
 const drawerWidth = 280;
 //Imported most of this function in https://mui.com/components/drawers/ to find out more
@@ -227,9 +235,35 @@ export default function Header() {
                 horizontal: "left",
               }}
             >
-              <MenuItem onClick={handleClose}>Production1</MenuItem>
-              <MenuItem onClick={handleClose}>Production2</MenuItem>
-              <MenuItem onClick={handleClose}>Production3</MenuItem>
+              <MenuItem onClick={handleClose}>
+                <DashboardIcon />
+                Dashboard
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <CorporateFareIcon /> Department Page
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <TheatersIcon />
+                Scenes
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <ArticleIcon /> Script
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <MessageIcon />
+                Messages
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <CalendarTodayIcon />
+                Calendar
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <PeopleAltIcon /> Crew
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <DeveloperBoardIcon />
+                Storyboards
+              </MenuItem>
             </Menu>
           </div>
           <Box display="flex" flexGrow={1} justifyContent="flex-end">
@@ -307,7 +341,7 @@ export default function Header() {
             <ListItemIcon>
               <ListAlt />
             </ListItemIcon>
-            <ListItemText primary={"Offers"} />
+            <ListItemText primary={"Position Offers"} />
           </ListItem>
           <Divider />
 

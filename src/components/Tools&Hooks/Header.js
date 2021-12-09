@@ -333,7 +333,7 @@ export default function Header() {
             <ListItemIcon>
               <ListAlt />
             </ListItemIcon>
-            <ListItemText primary={"Product List"} />
+            <ListItemText primary={"Production List"} />
           </ListItem>
           <Divider />
 

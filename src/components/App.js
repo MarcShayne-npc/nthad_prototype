@@ -20,7 +20,7 @@ import ProductionDashboard from "./Pages/ProductionDashboard";
 import ProductionProfileEdit from "./Pages/ProductionProfileEdit";
 import ProductionProfileView from "./Pages/ProductionProfileView";
 import ProductionCrewList from "./Pages/ProductionCrewList";
-
+import CreateDepartment from "./Pages/CreateDepartment";
 function App() {
   //this is so that I can pass data between components
   const [productionCompany, setProductionCompany] = useState("");
@@ -127,8 +127,14 @@ function App() {
                   <ProductionCrewList
                     productionId={productionId}
                     companyId={productionCompany}
+                    setProductionId={setProductionId}
                   />
                 }
+              />
+              <Route
+                path="/department-create"
+                exact
+                element={<CreateDepartment productionId={productionId} />}
               />
             </Route>
           </Routes>

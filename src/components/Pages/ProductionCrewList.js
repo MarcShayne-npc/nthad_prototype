@@ -19,35 +19,51 @@ import TreeItem from "@mui/lab/TreeItem";
 
 const data = {
   id: "root",
-  name: "Departments",
+  name: "Camera and Eletric",
   children: [
     {
       id: "Parent 1",
-      name: "Production",
+      name: "Camera",
       children: [
         {
           id: "1",
-          name: "Producer",
+          name: "Camera Operator",
         },
       ],
     },
     {
       id: "Parent 2",
-      name: "Camera and Eletric",
+      name: "Electric",
       children: [
         {
           id: "2",
-          name: "Director of Photography",
+          name: "Gaffer",
         },
       ],
     },
   ],
 };
 
-export default function ProductionCrewList({ productionId, companyId }) {
+export default function ProductionCrewList({
+  productionId,
+  companyId,
+  setProductionId,
+}) {
   //Mui dynamic rending for Treeitems Read more on https://mui.com/components/tree-view/#main-content
+  const navigate = useNavigate();
+  const production = productionId;
+
   const renderTree = (nodes) => (
-    <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name}>
+    <TreeItem
+      key={nodes.id}
+      nodeId={nodes.id}
+      label={nodes.name}
+      style={
+        nodes.id.includes("Parent")
+          ? { backgroundColor: "#5040a0", color: "white" }
+          : { backgroundColor: "white", color: "black" }
+      }
+    >
       {Array.isArray(nodes.children) ? (
         <>{nodes.children.map((node) => renderTree(node))}</>
       ) : null}
@@ -66,6 +82,10 @@ export default function ProductionCrewList({ productionId, companyId }) {
     }
   }
 
+  const handleDepartment = () => {
+    setProductionId(production);
+    navigate("/department-create");
+  };
   return (
     <div>
       <Grid container justifyContent="center" direction="row" marginBottom={1}>
@@ -76,6 +96,7 @@ export default function ProductionCrewList({ productionId, companyId }) {
             variant="outlined"
             style={{ padding: 20 }}
           >
+            <Button onClick={handleDepartment}>Create Department</Button>
             <TreeView
               aria-label="rich object"
               defaultCollapseIcon={<ExpandMoreIcon />}
@@ -93,7 +114,7 @@ export default function ProductionCrewList({ productionId, companyId }) {
             </TreeView>
             {addProduction ? (
               <>
-                <Button>Add Production</Button>
+                <Button>Add Positon</Button>
               </>
             ) : (
               <></>

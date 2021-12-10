@@ -40,7 +40,7 @@ export default function ProductionCompanyProfileView({ companyId }) {
   });
 
   useEffect(() => {
-    const getUsers = async () => {
+    const getProductionCompany = async () => {
       setLoading(true);
       //get Document reference from firebase by using current user uid
       const docRef = doc(db, "productioncompany", companyId);
@@ -66,7 +66,7 @@ export default function ProductionCompanyProfileView({ companyId }) {
           setLoading(false);
         });
     };
-    getUsers();
+    getProductionCompany();
   }, [companyId, documentId]);
 
   //This is so that you can change your profile info when

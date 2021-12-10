@@ -221,8 +221,6 @@ export default function Header() {
               Select Production
             </Button>
             <Menu
-              id="demo-positioned-menu"
-              aria-labelledby="demo-positioned-button"
               anchorEl={anchorEl}
               open={menuOpen}
               onClose={handleClose}

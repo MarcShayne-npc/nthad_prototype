@@ -98,7 +98,7 @@ export default function ProductionCompanyDashboard({
   );
 
   useEffect(() => {
-    const getUsers = async () => {
+    const getProductionCompany = async () => {
       setLoading(true);
 
       try {
@@ -113,7 +113,7 @@ export default function ProductionCompanyDashboard({
       }
       setLoading(false);
     };
-    getUsers();
+    getProductionCompany();
   }, [companyId, navigate]);
 
   const handleEditProfile = () => {

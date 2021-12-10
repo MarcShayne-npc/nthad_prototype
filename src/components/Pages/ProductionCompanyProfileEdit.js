@@ -51,7 +51,7 @@ export default function ProductionCompanyProfileEdit({ companyId }) {
   });
 
   useEffect(() => {
-    const getUsers = async () => {
+    const getProductionCompany = async () => {
       setLoading(true);
       console.log(companyId);
       try {
@@ -82,7 +82,7 @@ export default function ProductionCompanyProfileEdit({ companyId }) {
       }
       setLoading(false);
     };
-    getUsers();
+    getProductionCompany();
   }, [companyId, navigate]);
 
   //When user press submit button

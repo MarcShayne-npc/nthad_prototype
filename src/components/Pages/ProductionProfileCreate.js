@@ -32,7 +32,7 @@ export default function ProductionProfileCreate({ companyId }) {
     name: "",
   });
   useEffect(() => {
-    const getUsers = async () => {
+    const getProductionCompany = async () => {
       setLoading(true);
 
       try {
@@ -47,7 +47,7 @@ export default function ProductionProfileCreate({ companyId }) {
       }
       setLoading(false);
     };
-    getUsers();
+    getProductionCompany();
   }, [companyId, navigate]);
 
   //When user press submit button

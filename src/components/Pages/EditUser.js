@@ -30,7 +30,6 @@ export default function EditUser() {
   //User Data in firestore this is null if the user is new
   //all the data that is being pass through firestore
   //There is no "productioncompaniesowned" and productionsowned defaulted to be an empty array
-  //some values a
   const [userData, setUserData] = useState({
     displayname: "",
     stagename: "",

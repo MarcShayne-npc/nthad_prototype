@@ -1,65 +1,100 @@
 import React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Grid, TextField } from "@mui/material";
-import { useAuth } from "../../contexts/AuthContext";
 import Button from "@mui/material/Button";
 import { db } from "../../firebase";
 import {
   query,
   where,
-  setDoc,
   addDoc,
   collection,
-  serverTimestamp,
   doc,
   updateDoc,
-  arrayUnion,
   getDoc,
+  getDocs,
+  serverTimestamp,
 } from "firebase/firestore";
 import AlertMessage from "../Tools&Hooks/AlertMessage";
 import { useNavigate } from "react-router-dom";
+import Autocomplete from "@mui/material/Autocomplete";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function CreateDepartment({ productionId }) {
   //Set AlertMessage Status and passes to Alertmessage hook
   const [status, setStatusBase] = useState("");
   //current user that is logged in
-  const { currentUser } = useAuth();
   const navigate = useNavigate();
-  //All the references for the fields in Production
   const nameRef = useRef();
-  const autoRef = useRef();
-  const aboutRef = useRef();
-  const [error, setError] = useState(false);
+  const postRef = useRef();
+  const [error, setError] = useState({ name: false, parent: false });
   const [loading, setLoading] = useState(false);
-  const [companyData, setCompanyData] = useState({
+  const [productionData, setProductionData] = useState({
     name: "",
   });
-  //   useEffect(() => {
-  //     const getUsers = async () => {
-  //       setLoading(true);
+  const { currentUser } = useAuth();
+  const [department, setDepartment] = useState([]);
+  //value in the auto-complete textfield
+  const [value, setValue] = useState(null);
 
-  //       try {
-  //         const docRef = doc(db, "productioncompany", companyId);
-  //         await getDoc(docRef).then((res) => {
-  //           setCompanyData({
-  //             name: res.data().name,
-  //           });
-  //         });
-  //       } catch {
-  //         navigate("/producer-page");
-  //       }
-  //       setLoading(false);
-  //     };
-  //     getUsers();
-  //   }, [companyId, navigate]);
+  //This is for the autocomplete section in the department
+  useEffect(() => {
+    const getDepartment = async () => {
+      setLoading(true);
+      try {
+        const docRef = query(
+          collection(db, "production", productionId, "department"),
+          where("department_fields.parentid", "==", "")
+        );
+        const querySnapshot = await getDocs(docRef);
+        let arr2 = [];
+
+        querySnapshot.forEach((doc) => {
+          arr2.push({ name: doc.data().department_fields.name, id: doc.id });
+        });
+        setDepartment(arr2);
+      } catch (err) {
+        console.log(err);
+      }
+      setLoading(false);
+    };
+    getDepartment();
+  }, [productionId]);
+
+  //get Production name
+  useEffect(() => {
+    const getProduction = async () => {
+      setLoading(true);
+      try {
+        const docRef = doc(db, "production", productionId);
+        await getDoc(docRef).then((res) => {
+          setProductionData({
+            name: res.data().name,
+          });
+        });
+      } catch {
+        navigate("/producer-page");
+      }
+      setLoading(false);
+    };
+    getProduction();
+  }, [navigate, productionId]);
 
   //When user press submit button
-  const handleEditUser = async () => {
+  const handleCreateDepartment = async () => {
     //Gets all the reference and add document to firestore
     try {
-      //validation if name & short name has value
-      if (autoRef.current.value !== "") {
-        setError(false);
+      let parentId = "";
+      if (value !== null) {
+        //Finds the department Id & name
+        parentId = department.find((obj) => {
+          return obj.name === value.name;
+        });
+      }
+
+      //validation if name has value
+      if (nameRef.current.value !== "" && nameRef.current.value.trim() !== "") {
+        setError({ name: false, parent: false });
+
         const departmentRef = collection(
           db,
           "production",
@@ -67,11 +102,47 @@ export default function CreateDepartment({ productionId }) {
           "department"
         );
 
-        await setDoc(departmentRef, {
+        const positionRef = collection(
+          db,
+          "production",
+          productionId,
+          "position"
+        );
+
+        if (parentId.id === undefined) {
+          parentId = { id: "" };
+        } else {
+          const docRef = doc(
+            db,
+            "production",
+            productionId,
+            "department",
+            parentId.id
+          );
+
+          await updateDoc(docRef, {
+            "department_fields.haschildren": true,
+          });
+        }
+        //adds document in production/department
+        await addDoc(departmentRef, {
           department_fields: {
-            parentid: "",
+            parentid: parentId.id,
             haschildren: false,
-            name: autoRef.current.value,
+            name: nameRef.current.value,
+          },
+        });
+        //adds document in production/position
+        await addDoc(positionRef, {
+          position_fields: {
+            name: postRef.current.value,
+            departmentid: departmentRef.id,
+            departmentname: nameRef.current.value,
+            isdepartmenthead: false,
+            supervisorid: "",
+            status: "active", //from defined list "crewstatus"
+            userid: currentUser.uid, //userid
+            date: serverTimestamp(),
           },
         });
         //set the Alert to Success and display message
@@ -80,10 +151,13 @@ export default function CreateDepartment({ productionId }) {
           msg: "Production Company Created",
           key: Math.random(),
         });
-        // navigate("/producer-page");
+        setTimeout(() => {
+          //set the Alert to Success and display message
+          navigate("/production-crew-list");
+        }, 1000);
       } else {
         //if user required fields are empty
-        setError(true);
+        setError({ name: true });
         setStatusBase({
           lvl: "error",
           msg: "Required fields are empty",
@@ -92,10 +166,11 @@ export default function CreateDepartment({ productionId }) {
       }
     } catch (err) {
       console.log(err);
+      setError({ parent: true });
       //something went wrong
       setStatusBase({
         lvl: "error",
-        msg: "Failed to Create Department.",
+        msg: "Failed to Create Department. Make sure that Parent Department exist",
         key: Math.random(),
       });
     }
@@ -105,97 +180,179 @@ export default function CreateDepartment({ productionId }) {
     navigate("/production-crew-list");
   };
 
-  const handleAuto = (e) => {
-    let x = e.target.value;
-    console.log(x.length);
-    if (x.length <= 15) {
-      autoRef.current.value = e.target.value;
-    }
-  };
-
   return (
     <form>
-      <Grid>
-        <Button onClick={handleBack}>Back</Button>
-        {/*==================Create Deparment Section==================*/}
-        <Grid
-          container
-          columnSpacing={1}
-          rowSpacing={1}
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          marginBottom={1}
-        >
-          {!loading ? (
+      {!loading ? (
+        <Grid>
+          <Button onClick={handleBack}>Back</Button>
+          {/*==================Create Deparment Section==================*/}
+          <Grid
+            container
+            columnSpacing={1}
+            rowSpacing={1}
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            marginBottom={1}
+          >
             <Grid item xs={11} sm={8} md={6}>
-              <h2>Create Department for {companyData.name}</h2>
+              <h2>Create Department & Position for {productionData.name}</h2>
             </Grid>
-          ) : (
-            "loading..."
-          )}
-        </Grid>
-        {/*==================Name Section==================*/}
-        <Grid
-          container
-          columnSpacing={1}
-          rowSpacing={1}
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          marginBottom={1}
-        >
-          <Grid item xs={11} sm={8} md={3}>
-            Parent Department(Optional):
-            <TextField
-              id="outlined-required"
-              type="text"
-              variant="outlined"
-              inputRef={nameRef}
-              error={error}
-              required
-              sx={{ width: "100%" }}
-            />
           </Grid>
-          <Grid item xs={11} sm={8} md={3}>
-            Name of Department:
-            <TextField
-              inputProps={{ maxLength: 15 }}
-              id="outlined-required"
-              type="text"
-              variant="outlined"
-              inputRef={autoRef}
-              error={error}
-              required
-              sx={{ width: "100%" }}
-            />
-          </Grid>
-        </Grid>
+          {/*==================Department & name Section==================*/}
+          <Grid
+            container
+            columnSpacing={1}
+            rowSpacing={1}
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            marginBottom={1}
+          >
+            <Grid item xs={11} sm={8} md={3}>
+              Parent Department(Optional):
+              <Autocomplete
+                value={value}
+                onChange={(event, newValue) => {
+                  if (typeof newValue === "string") {
+                    setValue({
+                      name: newValue,
+                    });
+                  } else if (newValue && newValue.inputValue) {
+                    // Create a new value from the user input
+                    setValue({
+                      name: newValue.inputValue,
+                    });
+                  } else {
+                    setValue(newValue);
+                  }
+                }}
+                selectOnFocus
+                clearOnBlur
+                handleHomeEndKeys
+                options={department}
+                getOptionLabel={(option) => {
+                  // Value selected with enter, right from the input
+                  if (typeof option === "string") {
+                    return option;
+                  }
 
-        {/*==================Alert & Button Section==================*/}
-        <Grid
-          container
-          columnSpacing={5}
-          rowSpacing={5}
-          direction="row"
-          justifyContent="right"
-          alignItems="center"
-          marginBottom={1}
-        >
-          <Grid item xs={4}>
-            <Button onClick={handleEditUser} variant="outlined">
-              Create
-            </Button>
-            {status ? (
-              <AlertMessage
-                level={status.lvl}
-                key={status.key}
-                message={status.msg}
+                  // Regular option
+                  return option.name;
+                }}
+                renderOption={(props, option) => (
+                  <li {...props}>{option.name}</li>
+                )}
+                freeSolo
+                renderInput={(params) => (
+                  <TextField error={error.parent} {...params} />
+                )}
               />
-            ) : null}
+            </Grid>
+            <Grid item xs={11} sm={8} md={3}>
+              Name of Department:
+              <TextField
+                inputProps={{ maxLength: 15 }}
+                id="outlined-required"
+                type="text"
+                variant="outlined"
+                inputRef={nameRef}
+                error={error.name}
+                required
+                sx={{ width: "100%" }}
+              />
+            </Grid>
+          </Grid>
+          <Grid
+            container
+            columnSpacing={1}
+            rowSpacing={1}
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            marginBottom={1}
+          >
+            <Grid item xs={11} sm={8} md={3}>
+              Super Visor:
+              <Autocomplete
+                value={value}
+                onChange={(event, newValue) => {
+                  if (typeof newValue === "string") {
+                    setValue({
+                      name: newValue,
+                    });
+                  } else if (newValue && newValue.inputValue) {
+                    // Create a new value from the user input
+                    setValue({
+                      name: newValue.inputValue,
+                    });
+                  } else {
+                    setValue(newValue);
+                  }
+                }}
+                selectOnFocus
+                clearOnBlur
+                handleHomeEndKeys
+                options={department}
+                getOptionLabel={(option) => {
+                  // Value selected with enter, right from the input
+                  if (typeof option === "string") {
+                    return option;
+                  }
+
+                  // Regular option
+                  return option.name;
+                }}
+                renderOption={(props, option) => (
+                  <li {...props}>{option.name}</li>
+                )}
+                freeSolo
+                renderInput={(params) => (
+                  <TextField error={error.parent} {...params} />
+                )}
+              />
+            </Grid>
+            <Grid item xs={11} sm={8} md={3}>
+              Position Name:
+              <TextField
+                inputProps={{ maxLength: 15 }}
+                id="outlined-required"
+                type="text"
+                variant="outlined"
+                inputRef={postRef}
+                error={error.name}
+                required
+                sx={{ width: "100%" }}
+              />
+            </Grid>
+          </Grid>
+          {/*==================Alert & Button Section==================*/}
+          <Grid
+            container
+            columnSpacing={5}
+            rowSpacing={5}
+            direction="row"
+            justifyContent="right"
+            alignItems="center"
+            marginBottom={1}
+          >
+            <Grid item xs={4}>
+              <Button onClick={handleCreateDepartment} variant="outlined">
+                Create
+              </Button>
+              {status ? (
+                <AlertMessage
+                  level={status.lvl}
+                  key={status.key}
+                  message={status.msg}
+                />
+              ) : null}
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      ) : (
+        "loading..."
+      )}
     </form>
   );
 }

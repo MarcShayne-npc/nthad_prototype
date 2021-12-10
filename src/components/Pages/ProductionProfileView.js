@@ -46,7 +46,7 @@ export default function ProductionProfileView({
   const [user, setUser] = useState({ id: "", name: "" });
   useEffect(() => {
     //gets the company info
-    const getProCo = async () => {
+    const getProductionCompany = async () => {
       setLoading(true);
 
       //asynchronous get date from firebase then set's their data in a useState
@@ -68,7 +68,7 @@ export default function ProductionProfileView({
     };
 
     //get the production info
-    const getPro = async () => {
+    const getProduction = async () => {
       setLoading(true);
       try {
         const docRef = doc(db, "production", productionId);
@@ -109,8 +109,8 @@ export default function ProductionProfileView({
       }
     };
 
-    getPro();
-    getProCo();
+    getProduction();
+    getProductionCompany();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId, documentId, productionId]);
 

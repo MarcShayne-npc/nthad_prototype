@@ -24,7 +24,7 @@ export default function AlertMessage({ message, level }) {
           horizontal: "center",
         }}
         open={open}
-        autoHideDuration={1500}
+        autoHideDuration={2000}
         onClose={handleClose}
         variant="warning"
         ContentProps={{

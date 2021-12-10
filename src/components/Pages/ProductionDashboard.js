@@ -19,7 +19,7 @@ export default function ProductionDashboard({
   const [company, setCompany] = useState("");
   const [companyId, setCompanyId] = useState("");
   useEffect(() => {
-    const getPro = async () => {
+    const getProduction = async () => {
       setLoading(true);
 
       try {
@@ -43,7 +43,7 @@ export default function ProductionDashboard({
       }
       setLoading(false);
     };
-    getPro();
+    getProduction();
   }, [navigate, productionId]);
 
   const handleProductionEdit = () => {

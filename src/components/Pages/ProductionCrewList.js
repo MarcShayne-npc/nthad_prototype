@@ -60,7 +60,9 @@ export default function ProductionCrewList({
       label={nodes.name}
       style={
         nodes.id.includes("Parent")
-          ? { backgroundColor: "#5040a0", color: "white" }
+          ? { backgroundColor: "#2196f3", color: "white" }
+          : nodes.id.includes("root")
+          ? { backgroundColor: "#3f51b5", color: "white" }
           : { backgroundColor: "white", color: "black" }
       }
     >
@@ -69,6 +71,18 @@ export default function ProductionCrewList({
       ) : null}
     </TreeItem>
   );
+
+  const DataTreeView = ({ treeItems }) => {
+    return (
+      <TreeView
+        defaultCollapseIcon={<ExpandMoreIcon />}
+        defaultExpandIcon={<ChevronRightIcon />}
+        defaultExpanded={["root", "Parent 1", "Parent 2"]}
+      >
+        {renderTree(treeItems)}
+      </TreeView>
+    );
+  };
 
   const [addProduction, setAddProduction] = useState(false);
   const [manage, setManage] = useState(false);
@@ -96,22 +110,8 @@ export default function ProductionCrewList({
             variant="outlined"
             style={{ padding: 20 }}
           >
+            {productionId}
             <Button onClick={handleDepartment}>Create Department</Button>
-            <TreeView
-              aria-label="rich object"
-              defaultCollapseIcon={<ExpandMoreIcon />}
-              defaultExpanded={["root"]}
-              defaultExpandIcon={<ChevronRightIcon />}
-              sx={{
-                height: 400,
-                flexGrow: 1,
-                maxWidth: 400,
-                overflowY: "auto",
-              }}
-              onNodeSelect={action}
-            >
-              {renderTree(data)}
-            </TreeView>
             {addProduction ? (
               <>
                 <Button>Add Positon</Button>
@@ -126,6 +126,7 @@ export default function ProductionCrewList({
             ) : (
               <></>
             )}
+            <DataTreeView onClick={action} treeItems={data} />
           </Card>
         </Grid>
       </Grid>

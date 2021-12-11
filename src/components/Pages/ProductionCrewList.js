@@ -52,6 +52,29 @@ export default function ProductionCrewList({
   //Mui dynamic rending for Treeitems Read more on https://mui.com/components/tree-view/#main-content
   const navigate = useNavigate();
   const production = productionId;
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const getDepartment = async () => {
+      setLoading(true);
+      try {
+        const docRef = query(
+          collection(db, "production", productionId, "department"),
+          where("department_fields.parentid", "==", "")
+        );
+        const querySnapshot = await getDocs(docRef);
+        let arr2 = [];
+
+        querySnapshot.forEach((doc) => {
+          arr2.push({ name: doc.data().department_fields.name, id: doc.id });
+        });
+      } catch (err) {
+        console.log("something went wrong reloading...");
+      }
+      setLoading(false);
+    };
+    getDepartment();
+  }, [productionId]);
 
   const renderTree = (nodes) => (
     <TreeItem

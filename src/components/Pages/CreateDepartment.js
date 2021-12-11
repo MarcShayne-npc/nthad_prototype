@@ -53,7 +53,7 @@ export default function CreateDepartment({ productionId }) {
         });
         setDepartment(arr2);
       } catch (err) {
-        console.log(err);
+        console.log("something went wrong reloading...");
       }
       setLoading(false);
     };
@@ -144,6 +144,27 @@ export default function CreateDepartment({ productionId }) {
             userid: currentUser.uid, //userid
             date: serverTimestamp(),
           },
+          //then since positionRef.id is now declared
+          //add to reference then add document
+        }).then(function (positionRef) {
+          const positionHistoryRef = collection(
+            db,
+            "production",
+            productionId,
+            "position",
+            positionRef.id,
+            "positionhistory"
+          );
+          //add document in production/postion/positionhistory
+          addDoc(positionHistoryRef, {
+            positionhistory_fields: {
+              status: "created",
+              date: serverTimestamp(),
+              updatedbyid: currentUser.uid,
+              positiondetails: "",
+              userid: "",
+            },
+          });
         });
         //set the Alert to Success and display message
         setStatusBase({
@@ -196,7 +217,7 @@ export default function CreateDepartment({ productionId }) {
             marginBottom={1}
           >
             <Grid item xs={11} sm={8} md={6}>
-              <h2>Create Department & Position for {productionData.name}</h2>
+              <h2>Create Department for {productionData.name}</h2>
             </Grid>
           </Grid>
           {/*==================Department & name Section==================*/}
@@ -243,7 +264,6 @@ export default function CreateDepartment({ productionId }) {
                 renderOption={(props, option) => (
                   <li {...props}>{option.name}</li>
                 )}
-                freeSolo
                 renderInput={(params) => (
                   <TextField error={error.parent} {...params} />
                 )}
@@ -252,7 +272,6 @@ export default function CreateDepartment({ productionId }) {
             <Grid item xs={11} sm={8} md={3}>
               Name of Department:
               <TextField
-                inputProps={{ maxLength: 15 }}
                 id="outlined-required"
                 type="text"
                 variant="outlined"
@@ -272,46 +291,6 @@ export default function CreateDepartment({ productionId }) {
             alignItems="center"
             marginBottom={1}
           >
-            <Grid item xs={11} sm={8} md={3}>
-              Super Visor:
-              <Autocomplete
-                value={value}
-                onChange={(event, newValue) => {
-                  if (typeof newValue === "string") {
-                    setValue({
-                      name: newValue,
-                    });
-                  } else if (newValue && newValue.inputValue) {
-                    // Create a new value from the user input
-                    setValue({
-                      name: newValue.inputValue,
-                    });
-                  } else {
-                    setValue(newValue);
-                  }
-                }}
-                selectOnFocus
-                clearOnBlur
-                handleHomeEndKeys
-                options={department}
-                getOptionLabel={(option) => {
-                  // Value selected with enter, right from the input
-                  if (typeof option === "string") {
-                    return option;
-                  }
-
-                  // Regular option
-                  return option.name;
-                }}
-                renderOption={(props, option) => (
-                  <li {...props}>{option.name}</li>
-                )}
-                freeSolo
-                renderInput={(params) => (
-                  <TextField error={error.parent} {...params} />
-                )}
-              />
-            </Grid>
             <Grid item xs={11} sm={8} md={3}>
               Position Name:
               <TextField

@@ -92,23 +92,16 @@ export default function CreateDepartment({ productionId }) {
       }
 
       //validation if name has value
-      if (nameRef.current.value !== "" && nameRef.current.value.trim() !== "") {
+      if (
+        nameRef.current.value !== "" &&
+        nameRef.current.value.trim() !== "" &&
+        postRef.current.value !== "" &&
+        postRef.current.value.trim() !== ""
+      ) {
         setError({ name: false, parent: false });
 
-        const departmentRef = collection(
-          db,
-          "production",
-          productionId,
-          "department"
-        );
-
-        const positionRef = collection(
-          db,
-          "production",
-          productionId,
-          "position"
-        );
-
+        //auto complete when its blank
+        //else if false then update department
         if (parentId.id === undefined) {
           parentId = { id: "" };
         } else {
@@ -119,48 +112,54 @@ export default function CreateDepartment({ productionId }) {
             "department",
             parentId.id
           );
-
           await updateDoc(docRef, {
             haschildren: true,
           });
         }
         //adds document in production/department
-        await addDoc(departmentRef, {
-          parentid: parentId.id,
-          haschildren: false,
-          name: nameRef.current.value,
-        });
+        const deparmentId = await addDoc(
+          collection(db, "production", productionId, "department"),
+          {
+            parentid: parentId.id,
+            haschildren: false,
+            name: nameRef.current.value,
+          }
+        );
         //adds document in production/position
-        await addDoc(positionRef, {
-          name: postRef.current.value,
-          departmentid: departmentRef.id,
-          departmentname: nameRef.current.value,
-          isdepartmenthead: false,
-          supervisorid: "",
-          status: "active", //from defined list "crewstatus"
-          userid: currentUser.uid, //userid
-          date: serverTimestamp(),
-
-          //then since positionRef.id is now declared
-          //add to reference then add document
-        }).then(function (positionRef) {
-          const positionHistoryRef = collection(
+        const positionId = await addDoc(
+          collection(db, "production", productionId, "position"),
+          {
+            name: postRef.current.value,
+            departmentid: deparmentId.id,
+            departmentname: nameRef.current.value,
+            isdepartmenthead: true,
+            supervisorid: "",
+            status: "active", //from defined list "crewstatus"
+            userid: currentUser.uid, //userid
+            date: serverTimestamp(),
+            //then since positionRef.id is now declared
+            //add to reference then add document
+          }
+        );
+        //add document in production/postion/positionhistory
+        await addDoc(
+          collection(
             db,
             "production",
             productionId,
             "position",
-            positionRef.id,
+            positionId.id,
             "positionhistory"
-          );
-          //add document in production/postion/positionhistory
-          addDoc(positionHistoryRef, {
+          ),
+          {
             status: "created",
             date: serverTimestamp(),
             updatedbyid: currentUser.uid,
             positiondetails: "",
             userid: "",
-          });
-        });
+          }
+        );
+
         //set the Alert to Success and display message
         setStatusBase({
           lvl: "success",
@@ -289,7 +288,6 @@ export default function CreateDepartment({ productionId }) {
             <Grid item xs={11} sm={8} md={3}>
               Position Name:
               <TextField
-                inputProps={{ maxLength: 15 }}
                 id="outlined-required"
                 type="text"
                 variant="outlined"

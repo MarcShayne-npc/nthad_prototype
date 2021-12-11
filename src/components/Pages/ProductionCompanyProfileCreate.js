@@ -58,17 +58,16 @@ export default function ProductionCompanyProfileCreate() {
             email: emailRef.current.value,
             webpage: webRef.current.value,
             haslogo: false,
-            phone: {
-              countrycode: codeRef.current.value,
-              number: phoneRef.current.value,
-            },
-            address: {
-              street: streetRef.current.value,
-              street2: street2Ref.current.value,
-              city: cityRef.current.value,
-              state: stateRef.current.value,
-              country: countryRef.current.value,
-            },
+
+            countrycode: codeRef.current.value,
+            number: phoneRef.current.value,
+
+            street: streetRef.current.value,
+            street2: street2Ref.current.value,
+            city: cityRef.current.value,
+            state: stateRef.current.value,
+            country: countryRef.current.value,
+
             about: aboutRef.current.value,
             productions: [],
           }

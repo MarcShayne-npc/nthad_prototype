@@ -155,8 +155,8 @@ export default function Header() {
       await getDoc(docRef)
         .then((res) => {
           setUserData({
-            displayname: res.data().user_fields.displayname,
-            hasAvatar: res.data().user_fields.hasavatar,
+            displayname: res.data().displayname,
+            hasAvatar: res.data().hasavatar,
           });
         })
         .catch((err) => {

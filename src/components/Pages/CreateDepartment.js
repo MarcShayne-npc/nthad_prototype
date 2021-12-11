@@ -43,13 +43,13 @@ export default function CreateDepartment({ productionId }) {
       try {
         const docRef = query(
           collection(db, "production", productionId, "department"),
-          where("department_fields.parentid", "==", "")
+          where("parentid", "==", "")
         );
         const querySnapshot = await getDocs(docRef);
         let arr2 = [];
 
         querySnapshot.forEach((doc) => {
-          arr2.push({ name: doc.data().department_fields.name, id: doc.id });
+          arr2.push({ name: doc.data().name, id: doc.id });
         });
         setDepartment(arr2);
       } catch (err) {
@@ -121,29 +121,26 @@ export default function CreateDepartment({ productionId }) {
           );
 
           await updateDoc(docRef, {
-            "department_fields.haschildren": true,
+            haschildren: true,
           });
         }
         //adds document in production/department
         await addDoc(departmentRef, {
-          department_fields: {
-            parentid: parentId.id,
-            haschildren: false,
-            name: nameRef.current.value,
-          },
+          parentid: parentId.id,
+          haschildren: false,
+          name: nameRef.current.value,
         });
         //adds document in production/position
         await addDoc(positionRef, {
-          position_fields: {
-            name: postRef.current.value,
-            departmentid: departmentRef.id,
-            departmentname: nameRef.current.value,
-            isdepartmenthead: false,
-            supervisorid: "",
-            status: "active", //from defined list "crewstatus"
-            userid: currentUser.uid, //userid
-            date: serverTimestamp(),
-          },
+          name: postRef.current.value,
+          departmentid: departmentRef.id,
+          departmentname: nameRef.current.value,
+          isdepartmenthead: false,
+          supervisorid: "",
+          status: "active", //from defined list "crewstatus"
+          userid: currentUser.uid, //userid
+          date: serverTimestamp(),
+
           //then since positionRef.id is now declared
           //add to reference then add document
         }).then(function (positionRef) {
@@ -157,13 +154,11 @@ export default function CreateDepartment({ productionId }) {
           );
           //add document in production/postion/positionhistory
           addDoc(positionHistoryRef, {
-            positionhistory_fields: {
-              status: "created",
-              date: serverTimestamp(),
-              updatedbyid: currentUser.uid,
-              positiondetails: "",
-              userid: "",
-            },
+            status: "created",
+            date: serverTimestamp(),
+            updatedbyid: currentUser.uid,
+            positiondetails: "",
+            userid: "",
           });
         });
         //set the Alert to Success and display message

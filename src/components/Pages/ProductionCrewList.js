@@ -60,13 +60,13 @@ export default function ProductionCrewList({
       try {
         const docRef = query(
           collection(db, "production", productionId, "department"),
-          where("department_fields.parentid", "==", "")
+          where("parentid", "==", "")
         );
         const querySnapshot = await getDocs(docRef);
         let arr2 = [];
 
         querySnapshot.forEach((doc) => {
-          arr2.push({ name: doc.data().department_fields.name, id: doc.id });
+          arr2.push({ name: doc.data().name, id: doc.id });
         });
       } catch (err) {
         console.log("something went wrong reloading...");

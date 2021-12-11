@@ -85,9 +85,9 @@ export default function ProductionProfileView({
             getDoc(userRef).then((r) => {
               setUser({
                 id: res.data().owners[0],
-                name: r.data().user_fields.displayname,
+                name: r.data().displayname,
               });
-              if (r.data().user_fields.hasavatar) {
+              if (r.data().hasavatar) {
                 const getImage = async () => {
                   const imageRef = ref(
                     storage,

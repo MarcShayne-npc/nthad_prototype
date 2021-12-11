@@ -72,21 +72,21 @@ export default function EditUser() {
       await getDoc(docRef)
         .then((res) => {
           setUserData({
-            displayname: res.data().user_fields.displayname,
-            stagename: res.data().user_fields.stagename,
-            firstname: res.data().user_fields.legalfirstname,
-            lastname: res.data().user_fields.legallastname,
-            birthday: res.data().user_fields.birthday,
-            city: res.data().address.city,
-            country: res.data().address.country,
-            postalcode: res.data().address.postalcode,
-            state: res.data().address.state,
-            street: res.data().address.street,
-            unit: res.data().address.unit,
-            countrycode: res.data().phone.countrycode,
-            number: res.data().phone.number,
+            displayname: res.data().displayname,
+            stagename: res.data().stagename,
+            firstname: res.data().legalfirstname,
+            lastname: res.data().legallastname,
+            birthday: res.data().birthday,
+            city: res.data().city,
+            country: res.data().country,
+            postalcode: res.data().postalcode,
+            state: res.data().state,
+            street: res.data().street,
+            unit: res.data().unit,
+            countrycode: res.data().countrycode,
+            number: res.data().number,
           });
-          setHasAvatar(res.data().user_fields.hasavatar);
+          setHasAvatar(res.data().hasavatar);
           setLoading(false);
         })
         .catch((err) => {
@@ -127,27 +127,23 @@ export default function EditUser() {
           //Only required fields are needed if empty on non-required field
           //will leave blank value
           await updateDoc(doc(db, "user", currentUser.uid), {
-            user_fields: {
-              displayname: displayRef.current.value,
-              legalfirstname: firstRef.current.value,
-              legallastname: lastRef.current.value,
-              stagename: stageRef.current.value,
-              email: currentUser.email,
-              hasavatar: hasAvatar,
-              birthday: birthdayRef.current.value,
-            },
-            address: {
-              street: streetRef.current.value,
-              unit: unitRef.current.value,
-              city: cityRef.current.value,
-              state: stateRef.current.value,
-              country: countryRef.current.value,
-              postalcode: postalRef.current.value,
-            },
-            phone: {
-              countrycode: codeRef.current.value,
-              number: numberRef.current.value,
-            },
+            displayname: displayRef.current.value,
+            legalfirstname: firstRef.current.value,
+            legallastname: lastRef.current.value,
+            stagename: stageRef.current.value,
+            email: currentUser.email,
+            hasavatar: hasAvatar,
+            birthday: birthdayRef.current.value,
+
+            street: streetRef.current.value,
+            unit: unitRef.current.value,
+            city: cityRef.current.value,
+            state: stateRef.current.value,
+            country: countryRef.current.value,
+            postalcode: postalRef.current.value,
+
+            countrycode: codeRef.current.value,
+            number: numberRef.current.value,
           });
           //set the Alert to Success and display message
           setStatusBase({
@@ -212,27 +208,24 @@ export default function EditUser() {
           await setDoc(
             doc(db, "user", currentUser.uid),
             {
-              user_fields: {
-                displayname: displayRef.current.value,
-                legalfirstname: firstRef.current.value,
-                legallastname: lastRef.current.value,
-                stagename: stageRef.current.value,
-                email: currentUser.email,
-                hasavatar: hasAvatar,
-                birthday: birthdayRef.current.value,
-              },
-              address: {
-                street: streetRef.current.value,
-                unit: unitRef.current.value,
-                city: cityRef.current.value,
-                state: stateRef.current.value,
-                country: countryRef.current.value,
-                postalcode: postalRef.current.value,
-              },
-              phone: {
-                countrycode: codeRef.current.value,
-                number: numberRef.current.value,
-              },
+              displayname: displayRef.current.value,
+              legalfirstname: firstRef.current.value,
+              legallastname: lastRef.current.value,
+              stagename: stageRef.current.value,
+              email: currentUser.email,
+              hasavatar: hasAvatar,
+              birthday: birthdayRef.current.value,
+
+              street: streetRef.current.value,
+              unit: unitRef.current.value,
+              city: cityRef.current.value,
+              state: stateRef.current.value,
+              country: countryRef.current.value,
+              postalcode: postalRef.current.value,
+
+              countrycode: codeRef.current.value,
+              number: numberRef.current.value,
+
               productioncompaniesowned: [],
               productionsowned: [],
             },
@@ -300,7 +293,7 @@ export default function EditUser() {
             key: Math.random(),
           });
           updateDoc(doc(db, "user", currentUser.uid), {
-            "user_fields.hasavatar": true,
+            hasavatar: true,
           });
           getDownloadURL(uploadTask.snapshot.ref).then((url) => setUrl(url));
         }

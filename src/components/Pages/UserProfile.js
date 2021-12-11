@@ -62,22 +62,22 @@ export default function UserProfile({ userId }) {
       await getDoc(docRef)
         .then((res) => {
           setUserData({
-            displayname: res.data().user_fields.displayname,
-            stagename: res.data().user_fields.stagename,
-            firstname: res.data().user_fields.legalfirstname,
-            lastname: res.data().user_fields.legallastname,
-            birthday: res.data().user_fields.birthday,
-            email: res.data().user_fields.email,
-            city: res.data().address.city,
-            country: res.data().address.country,
-            postalcode: res.data().address.postalcode,
-            state: res.data().address.state,
-            street: res.data().address.street,
-            unit: res.data().address.unit,
-            countrycode: res.data().phone.countrycode,
-            number: res.data().phone.number,
+            displayname: res.data().displayname,
+            stagename: res.data().stagename,
+            firstname: res.data().legalfirstname,
+            lastname: res.data().legallastname,
+            birthday: res.data().birthday,
+            email: res.data().email,
+            city: res.data().city,
+            country: res.data().country,
+            postalcode: res.data().postalcode,
+            state: res.data().state,
+            street: res.data().street,
+            unit: res.data().unit,
+            countrycode: res.data().countrycode,
+            number: res.data().number,
           });
-          setHasAvatar(res.data().user_fields.hasavatar);
+          setHasAvatar(res.data().hasavatar);
           setLoading(false);
         })
         .catch((err) => {

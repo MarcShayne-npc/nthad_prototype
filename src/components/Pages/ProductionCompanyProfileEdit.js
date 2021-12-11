@@ -62,13 +62,13 @@ export default function ProductionCompanyProfileEdit({ companyId }) {
             email: res.data().email,
             web: res.data().webpage,
             about: res.data().about,
-            code: res.data().phone.countrycode,
-            phone: res.data().phone.number,
-            country: res.data().address.country,
-            city: res.data().address.city,
-            state: res.data().address.state,
-            street: res.data().address.street,
-            street2: res.data().address.street2,
+            code: res.data().countrycode,
+            phone: res.data().number,
+            country: res.data().country,
+            city: res.data().city,
+            state: res.data().state,
+            street: res.data().street,
+            street2: res.data().street2,
           });
           setSearchable(res.data().searchable);
         });

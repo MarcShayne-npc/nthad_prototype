@@ -21,6 +21,10 @@ import ProductionProfileEdit from "./Pages/ProductionProfileEdit";
 import ProductionProfileView from "./Pages/ProductionProfileView";
 import ProductionCrewList from "./Pages/ProductionCrewList";
 import CreateDepartment from "./Pages/CreateDepartment";
+import ProductionOffer from "./Pages/ProductionOffer";
+import CreatePosition from "./Pages/CreatePosition";
+import EditDepartment from "./Pages/EditDepartment";
+
 function App() {
   //this is so that I can pass data between components
   const [productionCompany, setProductionCompany] = useState("");
@@ -136,6 +140,9 @@ function App() {
                 exact
                 element={<CreateDepartment productionId={productionId} />}
               />
+              <Route path="/production-offer" element={<ProductionOffer />} />
+              <Route path="/position-create" element={<CreatePosition />} />
+              <Route path="/edit-department" element={<EditDepartment />} />
             </Route>
           </Routes>
         </Router>

@@ -1,10 +1,11 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { Button, Grid, Card, Link } from "@mui/material";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { Create } from "@mui/icons-material";
+import Typography from "@mui/material/Typography";
 
 export default function ProductionDashboard({
   productionId,
@@ -18,6 +19,15 @@ export default function ProductionDashboard({
   });
   const [company, setCompany] = useState("");
   const [companyId, setCompanyId] = useState("");
+  const [crew, setCrewCount] = useState({
+    Position: 0,
+    Filled: 0,
+    Unfilled: 0,
+    Offers: 0,
+    WithoutOffers: 0,
+    Quit: 0,
+    Declined: 0,
+  });
   useEffect(() => {
     const getProduction = async () => {
       setLoading(true);
@@ -37,6 +47,66 @@ export default function ProductionDashboard({
           getDoc(coRef).then((r) => {
             setCompany(r.data().name);
           });
+        });
+
+        const positionRef = collection(
+          db,
+          "production",
+          productionId,
+          "position"
+        );
+        const querySnapshot2 = await getDocs(positionRef);
+
+        let position = 0;
+        let active = 0;
+        let created = 0;
+        let offered = 0;
+        let declined = 0;
+        let retracted = 0;
+        let terminated = 0;
+        let quit = 0;
+        let completed = 0;
+        let removed = 0;
+
+        //adds all the position to the arr position
+        querySnapshot2.forEach((doc) => {
+          position++;
+          if (doc.data().name.includes("active")) {
+            active++;
+          }
+          if (doc.data().name.includes("created")) {
+            created++;
+          }
+          if (doc.data().name.includes("offered")) {
+            offered++;
+          }
+          if (doc.data().name.includes("declined")) {
+            declined++;
+          }
+          if (doc.data().name.includes("retracted")) {
+            retracted++;
+          }
+          if (doc.data().name.includes("terminated")) {
+            terminated++;
+          }
+          if (doc.data().name.includes("quit")) {
+            quit++;
+          }
+          if (doc.data().name.includes("completed")) {
+            completed++;
+          }
+          if (doc.data().name.includes("removed")) {
+            removed++;
+          }
+        });
+        setCrewCount({
+          Position: position - removed,
+          Filled: active + completed,
+          Unfilled: active - removed - completed,
+          Offers: offered,
+          WithoutOffers: created + declined + retracted + terminated + quit,
+          Quit: quit,
+          Declined: declined,
         });
       } catch {
         navigate("/producer-page");
@@ -118,7 +188,14 @@ export default function ProductionDashboard({
                 align="center"
                 variant="outlined"
                 style={{ padding: 20 }}
-              ></Card>
+              >
+                <Typography>Positions: {crew.Position}</Typography>
+                <Typography>Filled: {crew.Filled}</Typography>
+                <Typography>Unfilled: {crew.Unfilled}</Typography>
+                <Typography>Without Offers: {crew.WithoutOffers}</Typography>
+                <Typography>Quit: {crew.Quit}</Typography>
+                <Typography>Declined: {crew.Declined}</Typography>
+              </Card>
             </Grid>
           </Grid>
           <Grid container marginBottom={1}>

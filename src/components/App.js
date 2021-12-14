@@ -24,13 +24,15 @@ import CreateDepartment from "./Pages/CreateDepartment";
 import ProductionOffer from "./Pages/ProductionOffer";
 import CreatePosition from "./Pages/CreatePosition";
 import EditDepartment from "./Pages/EditDepartment";
+import Dashboard from "./Pages/Dashboard";
+import PositionHistory from "./Pages/PositionHistory";
 
 function App() {
   //this is so that I can pass data between components
   const [productionCompany, setProductionCompany] = useState("");
   const [productionId, setProductionId] = useState("");
   const [userId, setUserId] = useState("");
-
+  const [positionId, setPositionId] = useState("");
   return (
     <Container>
       <AuthProvider>
@@ -40,7 +42,16 @@ function App() {
             <Route path="/" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route exact path="/" element={<PrivateRoute />}>
-              <Route path="/production-list" element={<ProductionList />} />
+              <Route
+                path="/production-list"
+                exact
+                element={
+                  <ProductionList
+                    setPositionId={setPositionId}
+                    setProductionId={setProductionId}
+                  />
+                }
+              />
               <Route path="/edit-profile" element={<EditUser />} />
               <Route
                 path="/producer-page"
@@ -132,17 +143,33 @@ function App() {
                     productionId={productionId}
                     companyId={productionCompany}
                     setProductionId={setProductionId}
+                    setProductionCompany={setProductionCompany}
                   />
                 }
               />
               <Route
                 path="/department-create"
                 exact
-                element={<CreateDepartment productionId={productionId} />}
+                element={
+                  <CreateDepartment
+                    productionId={productionId}
+                    companyId={productionCompany}
+                  />
+                }
               />
               <Route path="/production-offer" element={<ProductionOffer />} />
               <Route path="/position-create" element={<CreatePosition />} />
               <Route path="/edit-department" element={<EditDepartment />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <Dashboard
+                    positionId={positionId}
+                    productionId={productionId}
+                  />
+                }
+              />
+              <Route path="/position-history" element={<PositionHistory />} />
             </Route>
           </Routes>
         </Router>

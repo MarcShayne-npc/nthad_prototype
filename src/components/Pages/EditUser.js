@@ -366,7 +366,7 @@ export default function EditUser() {
             <Grid item xs={4}>
               <label htmlFor="contained-button-file">
                 <Input
-                  accept=".jpg"
+                  accept="image/png, image/jpeg"
                   id="contained-button-file"
                   multiple
                   type="file"
@@ -377,7 +377,7 @@ export default function EditUser() {
                 </Button>
               </label>
               <Typography variant="subtitle1">
-                Image format must be JPG only
+                Image format must be JPG,GIF or PNG only
               </Typography>
               <Typography variant="subtitle1">
                 Max file size is 200kb

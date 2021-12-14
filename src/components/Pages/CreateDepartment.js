@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useAuth } from "../../contexts/AuthContext";
 
-export default function CreateDepartment({ productionId }) {
+export default function CreateDepartment({ productionId, companyId }) {
   //Set AlertMessage Status and passes to Alertmessage hook
   const [status, setStatusBase] = useState("");
   //current user that is logged in
@@ -33,6 +33,9 @@ export default function CreateDepartment({ productionId }) {
   });
   const { currentUser } = useAuth();
   const [department, setDepartment] = useState([]);
+  const [companyData, setCompanyData] = useState({
+    name: "",
+  });
   //value in the auto-complete textfield
   const [value, setValue] = useState(null);
 
@@ -41,30 +44,39 @@ export default function CreateDepartment({ productionId }) {
     const getDepartment = async () => {
       setLoading(true);
       try {
+        //get all non-sub-department for auto list later
         const docRef = query(
           collection(db, "production", productionId, "department"),
           where("parentid", "==", "")
         );
         const querySnapshot = await getDocs(docRef);
         let arr2 = [];
+        //get company name
+        const coRef = doc(db, "productioncompany", companyId);
+        await getDoc(coRef).then((res) => {
+          setCompanyData({
+            name: res.data().name,
+          });
+        });
 
         querySnapshot.forEach((doc) => {
           arr2.push({ name: doc.data().name, id: doc.id });
         });
         setDepartment(arr2);
       } catch (err) {
-        console.log("something went wrong reloading...");
+        navigate("/producer-page");
       }
       setLoading(false);
     };
     getDepartment();
-  }, [productionId]);
+  }, [companyId, navigate, productionId]);
 
   //get Production name
   useEffect(() => {
     const getProduction = async () => {
       setLoading(true);
       try {
+        //get production name
         const docRef = doc(db, "production", productionId);
         await getDoc(docRef).then((res) => {
           setProductionData({
@@ -160,6 +172,19 @@ export default function CreateDepartment({ productionId }) {
           }
         );
 
+        //add document in user/userposition
+        await addDoc(collection(db, "user", currentUser.uid, "userposition"), {
+          productioncompanyid: companyId,
+          productioncompanyname: companyData.name,
+          productionid: productionId,
+          positionid: positionId.id,
+          productionname: productionData.name,
+          departmentname: nameRef.current.value,
+          departmentid: deparmentId.id,
+          positionname: postRef.current.value,
+          positiondetails: "",
+          date: serverTimestamp(),
+        });
         //set the Alert to Success and display message
         setStatusBase({
           lvl: "success",

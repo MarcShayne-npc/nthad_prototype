@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { query, collection, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/AuthContext";
@@ -27,64 +27,58 @@ function MinusSquare(props) {
   );
 }
 
-export default function ProductionList() {
+export default function ProductionList({ setProductionId, setPositionId }) {
   //current user that is logged in
   const { currentUser } = useAuth();
   const userUid = currentUser.uid;
   const navigate = useNavigate();
   //Data for production Company
 
-  const [data3, setData3] = useState({
+  const [data, setData] = useState({
     id: "root",
     name: "Production Company Owned",
     children: [{ id: "1", name: "Company Name", docId: "" }],
   });
   const [loading, setLoading] = useState(true);
 
-  //When page load setLoading to true
-  //Get Production Company owned & production Owned
   useEffect(() => {
     const getProductionCompany = async () => {
       setLoading(true);
-      //get Document reference from firebase by using current user uid
-      //if the owners field contains user uid
 
-      const q2 = query(
-        collection(db, "production"),
-        where("owners", "array-contains", userUid)
-      );
-      //Get company specified docs
-      const querySnapshot2 = await getDocs(q2);
+      const q = collection(db, "user", currentUser.uid, "userposition");
+      const querySnapshot = await getDocs(q);
 
-      //this variables are for productions object
-      let arr2 = [];
-      let n = 0;
-      //For each company the user owned will add to children property of Data
-      //also adds a Id with each children incrementing
-      //gets the production id
-      let arr4 = [];
-      querySnapshot2.forEach((doc) => {
-        arr2.push({
-          id: (n + 1).toString(),
-          name: doc.data().name,
-          proId: doc.id,
+      let arr = [];
+      querySnapshot.forEach((doc) => {
+        arr.push({
+          id: doc.data().productionid,
+          name: doc.data().productionname,
         });
-        arr4.push(doc.id);
-        n++;
       });
+
+      //filters arr for duplicates
+      const filteredArr = arr.reduce((acc, current) => {
+        const x = acc.find((doc) => doc.id === current.id);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
+        }
+      }, []);
 
       //sets the Data for all the array elements in arry
-      setData3({
-        id: "root2",
-        name: "Production Owned",
-        children: arr2,
+      setData({
+        id: "root",
+        name: "Production",
+        children: filteredArr,
       });
+
       //When all is done set loading to false
       setLoading(false);
     };
 
     getProductionCompany();
-  }, [userUid]);
+  }, [currentUser.uid, userUid]);
 
   const renderTree = (nodes) => (
     <TreeItem
@@ -103,18 +97,86 @@ export default function ProductionList() {
     </TreeItem>
   );
 
+  const [positionData, setPositionData] = useState({
+    id: "root",
+    name: "Position",
+    children: "",
+  });
+
+  const action = async (event, nodes) => {
+    const q = query(
+      collection(db, "production", nodes, "position"),
+      where("userid", "==", currentUser.uid)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    let arr = [];
+    let arr2 = [];
+    querySnapshot.forEach((doc) => {
+      arr.push({
+        id: doc.id,
+        name: doc.data().shortname,
+      });
+      arr2.push(doc.data().departmentname);
+    });
+    let arr3 = [];
+    let i = 0;
+
+    arr2.forEach((child) => {
+      arr3.push({
+        id: `parent ${i}`,
+        name: child,
+        children: [arr[i]],
+      });
+
+      i++;
+    });
+
+    if (!nodes.includes("root")) {
+      setProductionId(nodes);
+    }
+    setPositionData({
+      id: "root",
+      name: "Position",
+      children: arr3,
+    });
+  };
+
+  const action2 = (event, nodes) => {
+    if (!nodes.includes("parent") && !nodes.includes("root")) {
+      setPositionId(nodes);
+      navigate("/dashboard");
+    }
+  };
+
+  const handlePosHis = () => {
+    navigate("/position-history");
+  };
   return (
     <div>
       {!loading ? (
         <>
+          <Button onClick={handlePosHis}>Position History</Button>
           <TreeView
             aria-label="rich object"
             defaultCollapseIcon={<MinusSquare />}
             defaultExpandIcon={<PlusSquare />}
-            defaultExpanded={["root2"]}
+            defaultExpanded={["root"]}
             sx={{ height: 200, flexGrow: 1, maxWidth: 400, overflowY: "auto" }}
+            onNodeSelect={action}
           >
-            {renderTree(data3)}
+            {renderTree(data)}
+          </TreeView>
+          <TreeView
+            aria-label="rich object"
+            defaultCollapseIcon={<MinusSquare />}
+            defaultExpandIcon={<PlusSquare />}
+            defaultExpanded={["root"]}
+            sx={{ height: 300, flexGrow: 1, maxWidth: 400, overflowY: "auto" }}
+            onNodeSelect={action2}
+          >
+            {renderTree(positionData)}
           </TreeView>
         </>
       ) : (

@@ -71,38 +71,39 @@ export default function ProductionDashboard({
         //adds all the position to the arr position
         querySnapshot2.forEach((doc) => {
           position++;
-          if (doc.data().name.includes("active")) {
+          if (doc.data().status.includes("active")) {
             active++;
           }
-          if (doc.data().name.includes("created")) {
+          if (doc.data().status.includes("created")) {
             created++;
           }
-          if (doc.data().name.includes("offered")) {
+          if (doc.data().status.includes("offered")) {
             offered++;
           }
-          if (doc.data().name.includes("declined")) {
+          if (doc.data().status.includes("declined")) {
             declined++;
           }
-          if (doc.data().name.includes("retracted")) {
+          if (doc.data().status.includes("retracted")) {
             retracted++;
           }
-          if (doc.data().name.includes("terminated")) {
+          if (doc.data().status.includes("terminated")) {
             terminated++;
           }
-          if (doc.data().name.includes("quit")) {
+          if (doc.data().status.includes("quit")) {
             quit++;
           }
-          if (doc.data().name.includes("completed")) {
+          if (doc.data().status.includes("completed")) {
             completed++;
           }
-          if (doc.data().name.includes("removed")) {
+          if (doc.data().status.includes("removed")) {
             removed++;
           }
         });
+        console.log(active);
         setCrewCount({
           Position: position - removed,
           Filled: active + completed,
-          Unfilled: active - removed - completed,
+          Unfilled: position - active - removed - completed,
           Offers: offered,
           WithoutOffers: created + declined + retracted + terminated + quit,
           Quit: quit,

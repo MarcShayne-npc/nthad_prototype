@@ -19,6 +19,7 @@ export default function ProductionCrewList({
   productionId,
   companyId,
   setProductionId,
+  setProductionCompany,
 }) {
   //Mui dynamic rending for Treeitems Read more on https://mui.com/components/tree-view/#main-content
   const navigate = useNavigate();
@@ -124,13 +125,12 @@ export default function ProductionCrewList({
         setSub(arr2);
         setData(arr);
       } catch (err) {
-        console.log(err);
-        console.log("something went wrong reloading...");
+        navigate("/producer-page");
       }
       setLoading(false);
     };
     getDepartment();
-  }, [productionId]);
+  }, [navigate, productionId]);
 
   //render TreeItems
   const getTreeItemsFromData = (treeItems) => {
@@ -228,6 +228,7 @@ export default function ProductionCrewList({
   }
   //Navigates to the Create depeartment page
   const handleDepartment = () => {
+    setProductionCompany(companyId);
     setProductionId(productionId);
     navigate("/department-create");
   };

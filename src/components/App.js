@@ -33,6 +33,8 @@ function App() {
   const [productionId, setProductionId] = useState("");
   const [userId, setUserId] = useState("");
   const [positionId, setPositionId] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
+
   return (
     <Container>
       <AuthProvider>
@@ -144,6 +146,7 @@ function App() {
                     companyId={productionCompany}
                     setProductionId={setProductionId}
                     setProductionCompany={setProductionCompany}
+                    setDepartmentId={setDepartmentId}
                   />
                 }
               />
@@ -158,14 +161,33 @@ function App() {
                 }
               />
               <Route path="/production-offer" element={<ProductionOffer />} />
-              <Route path="/position-create" element={<CreatePosition />} />
-              <Route path="/edit-department" element={<EditDepartment />} />
+              <Route
+                path="/position-create"
+                element={
+                  <CreatePosition
+                    productionId={productionId}
+                    companyId={productionCompany}
+                    departmentId={departmentId}
+                  />
+                }
+              />
+              <Route
+                path="/edit-department"
+                element={
+                  <EditDepartment
+                    productionId={productionId}
+                    departmentId={departmentId}
+                  />
+                }
+              />
               <Route
                 path="/dashboard"
                 element={
                   <Dashboard
                     positionId={positionId}
                     productionId={productionId}
+                    setProductionId={setProductionId}
+                    setProductionCompany={setProductionCompany}
                   />
                 }
               />

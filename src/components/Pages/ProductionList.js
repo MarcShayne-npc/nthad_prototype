@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { query, collection, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/AuthContext";
@@ -116,10 +116,11 @@ export default function ProductionList({ setProductionId, setPositionId }) {
     querySnapshot.forEach((doc) => {
       arr.push({
         id: doc.id,
-        name: doc.data().shortname,
+        name: doc.data().name,
       });
       arr2.push(doc.data().departmentname);
     });
+    console.log(arr);
     let arr3 = [];
     let i = 0;
 

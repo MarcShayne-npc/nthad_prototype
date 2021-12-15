@@ -20,15 +20,30 @@ export default function ProductionCrewList({
   companyId,
   setProductionId,
   setProductionCompany,
+  setDepartmentId,
 }) {
   //Mui dynamic rending for Treeitems Read more on https://mui.com/components/tree-view/#main-content
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  //Data for treeview
   const [data, setData] = useState([]);
+  //sub department
   const [sub, setSub] = useState([]);
+  //position
   const [pos, setPos] = useState([]);
+  //expansion for treeview
   const [expName, setExpName] = useState([]);
+  //current clicked treeview id
+  const [clciked, setClicked] = useState("");
+  //The current selected name of Treeview
+  const [nameButton, setNameButton] = useState("");
+  //Button management on selected Item in treeview
+  const [addPosition, setAddPosition] = useState(false);
+  const [manage, setManage] = useState(false);
+  //Anchor for the Filter Button
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
   useEffect(() => {
     const getDepartment = async () => {
@@ -189,19 +204,20 @@ export default function ProductionCrewList({
     );
   };
   const handlePosition = () => {
+    setDepartmentId(clciked);
+    setProductionCompany(companyId);
+    setProductionId(productionId);
     navigate("/position-create");
   };
   const handleManage = () => {
     navigate("/production-offer");
   };
   const handleEdit = () => {
+    setProductionId(productionId);
+    setDepartmentId(clciked);
     navigate("/edit-department");
   };
-  //The current selected name of Treeview
-  const [nameButton, setNameButton] = useState("");
-  //Button management on selected Item in treeview
-  const [addPosition, setAddPosition] = useState(false);
-  const [manage, setManage] = useState(false);
+
   function action(event, nodeId) {
     //I made the node Id from root/parent/number#
     //this is so that I could render the Addposition button or the Manage a postion button
@@ -210,11 +226,13 @@ export default function ProductionCrewList({
       if (data.find((el) => el.id === nodeId)) {
         const x = data.findIndex((el) => el.id === nodeId);
         setNameButton(data[x].name);
+        setClicked(data[x].docId);
       }
       //if its a Sub department
       if (sub.find((dat) => dat.id === nodeId)) {
         const x = sub.findIndex((el) => el.id === nodeId);
         setNameButton(sub[x].name);
+        setClicked(sub[x].docId);
       }
       setAddPosition(true);
       setManage(false);
@@ -224,17 +242,17 @@ export default function ProductionCrewList({
       setNameButton(pos[x].name);
       setAddPosition(false);
       setManage(true);
+      setClicked(pos[x].docId);
     }
   }
+
   //Navigates to the Create depeartment page
   const handleDepartment = () => {
     setProductionCompany(companyId);
     setProductionId(productionId);
     navigate("/department-create");
   };
-  //Anchor for the Filter Button
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+
   //When Filter button is pressed
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);

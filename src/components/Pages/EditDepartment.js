@@ -11,6 +11,7 @@ import {
   getDoc,
   getDocs,
   writeBatch,
+  updateDoc,
 } from "firebase/firestore";
 import AlertMessage from "../Tools&Hooks/AlertMessage";
 import { useNavigate } from "react-router-dom";
@@ -31,19 +32,15 @@ export default function EditDepartment({ departmentId, productionId }) {
   const { currentUser } = useAuth();
   const [department, setDepartment] = useState([]);
   const [userPosDep, setUserPosDep] = useState([]);
+  const [proPos, setProPos] = useState([]);
   //value in the auto-complete textfield
   const [value, setValue] = useState(null);
-
+  const [changeDep, setChangeDep] = useState(true);
   //This is for the autocomplete section in the department
   useEffect(() => {
     const getDepartment = async () => {
       setLoading(true);
       try {
-        //get all non-sub-department for auto list later
-        const docRef = query(
-          collection(db, "production", productionId, "department"),
-          where("parentid", "==", "")
-        );
         //get all document id from user/userposition
         //to change department name later
         const depRef = query(
@@ -51,24 +48,66 @@ export default function EditDepartment({ departmentId, productionId }) {
           where("departmentid", "==", departmentId)
         );
         let arr = [];
-        let depName = "";
         const department = await getDocs(depRef);
         department.forEach((doc) => {
           arr.push(doc.id);
-          depName = doc.data().departmentname;
         });
-        console.log(depName);
         setUserPosDep(arr);
 
-        const querySnapshot = await getDocs(docRef);
-        let arr2 = [];
+        //get all document id from production/position
+        //to change department name later
+        const proPosRef = query(
+          collection(db, "production", productionId, "position"),
+          where("departmentid", "==", departmentId)
+        );
+        let arr4 = [];
+        const proPos = await getDocs(proPosRef);
+        proPos.forEach((doc) => {
+          arr4.push(doc.id);
+        });
+        setProPos(arr4);
 
+        //get Department name
+        const docRef = doc(
+          db,
+          "production",
+          productionId,
+          "department",
+          departmentId
+        );
+        let departmentName = "";
+        await getDoc(docRef).then((res) => {
+          setDepartmentData({
+            name: res.data().name,
+            parentid: res.data().parentid,
+          });
+          departmentName = res.data().name;
+        });
+
+        //Autocomplete field only pesent option if department is a sub-department
+        //Parent department are not allowed  removes autoComplete
+        const allDepRef = collection(
+          db,
+          "production",
+          productionId,
+          "department"
+        );
+        const querySnapshot = await getDocs(allDepRef);
+        let arr2 = [];
+        let arr3 = [];
+        //filter parent departments departments
         querySnapshot.forEach((doc) => {
-          //removes its own name cause a parent dep can't be its own parent dep
-          if (doc.data().name !== depName) {
+          //get all Parent Departments
+          if (doc.data().parentid === "") {
             arr2.push({ name: doc.data().name, id: doc.id });
+            //if this is true meaning its a Parent department
+            arr3.push(doc.data().name);
           }
         });
+
+        if (arr3.includes(departmentName)) {
+          setChangeDep(false);
+        }
         setDepartment(arr2);
       } catch (err) {
         console.log(err);
@@ -79,48 +118,78 @@ export default function EditDepartment({ departmentId, productionId }) {
     getDepartment();
   }, [currentUser.uid, departmentId, navigate, productionId]);
 
-  //get Department name
-  useEffect(() => {
-    const getDepartment = async () => {
-      setLoading(true);
-      try {
-        //get production name
-        const docRef = doc(
-          db,
-          "production",
-          productionId,
-          "department",
-          departmentId
-        );
-        await getDoc(docRef).then((res) => {
-          setDepartmentData({
-            name: res.data().name,
-          });
-        });
-      } catch {
-        navigate("/producer-page");
-      }
-      setLoading(false);
-    };
-    getDepartment();
-  }, [departmentId, navigate, productionId]);
-
   //When user press submit button
   const handleEditDepartment = async () => {
     try {
       //validation if name has value
       if (nameRef.current.value !== "" && nameRef.current.value.trim() !== "") {
         setError({ name: false, parent: false });
+        //this happens only when change department field has value
+        //if sub department want to change to a diffrent parent deparment or
+        //Parent department with children are not allowed to become a sub department
 
-        //when department want to join a department as a sub department
+        if (value !== null) {
+          //change current parentid to new parent department
+          const depRef = doc(
+            db,
+            "production",
+            productionId,
+            "department",
+            departmentId
+          );
+          await updateDoc(depRef, { parentid: value.id });
+          //Make new Parent department haschildren to true
+          const newDepRef = doc(
+            db,
+            "production",
+            productionId,
+            "department",
+            value.id
+          );
+          await updateDoc(newDepRef, { haschildren: true });
+          //Update old department if it still has children
+          const oldDepRef = query(
+            collection(db, "production", productionId, "department"),
+            where("parentid", "==", departmentData.parentid)
+          );
+          const querySnapshot = await getDocs(oldDepRef);
+          if (querySnapshot.empty) {
+            //if its empty then update department haschildren to false
+            const docRef = doc(
+              db,
+              "production",
+              productionId,
+              "department",
+              departmentData.parentid
+            );
+            await updateDoc(docRef, { haschildren: false });
+          }
+        }
 
         //update departmentname department
-
+        const depRef = doc(
+          db,
+          "production",
+          productionId,
+          "department",
+          departmentId
+        );
+        await updateDoc(depRef, { name: nameRef.current.value });
         //update departmentname position
+        const batch = writeBatch(db);
+        proPos.forEach((id) => {
+          const updateNmae = doc(
+            db,
+            "production",
+            productionId,
+            "position",
+            id
+          );
+          batch.update(updateNmae, { departmentname: nameRef.current.value });
+        });
 
         //update departmentname at userposition
-        const batch = writeBatch(db);
-        userPosDep.foreach((id) => {
+        userPosDep.forEach((id) => {
           const updateName = doc(
             db,
             "user",
@@ -135,13 +204,13 @@ export default function EditDepartment({ departmentId, productionId }) {
         //set the Alert to Success and display message
         setStatusBase({
           lvl: "success",
-          msg: "Production Company Created",
+          msg: "Production Company Updated",
           key: Math.random(),
         });
-        setTimeout(() => {
-          //set the Alert to Success and display message
-          navigate("/production-crew-list");
-        }, 1000);
+        // setTimeout(() => {
+        //   //set the Alert to Success and display message
+        //   navigate("/production-crew-list");
+        // }, 1000);
       } else {
         //if user required fields are empty
         setError({ name: true });
@@ -157,7 +226,7 @@ export default function EditDepartment({ departmentId, productionId }) {
       //something went wrong
       setStatusBase({
         lvl: "error",
-        msg: "Failed to Create Department. Make sure that Parent Department exist",
+        msg: "Failed to Edit Department. Make sure that Parent Department exist",
         key: Math.random(),
       });
     }
@@ -196,45 +265,48 @@ export default function EditDepartment({ departmentId, productionId }) {
             alignItems="center"
             marginBottom={1}
           >
-            <Grid item xs={11} sm={8} md={3}>
-              Change Department:
-              <Autocomplete
-                value={value}
-                onChange={(event, newValue) => {
-                  if (typeof newValue === "string") {
-                    setValue({
-                      name: newValue,
-                    });
-                  } else if (newValue && newValue.inputValue) {
-                    // Create a new value from the user input
-                    setValue({
-                      name: newValue.inputValue,
-                    });
-                  } else {
-                    setValue(newValue);
-                  }
-                }}
-                selectOnFocus
-                clearOnBlur
-                handleHomeEndKeys
-                options={department}
-                getOptionLabel={(option) => {
-                  // Value selected with enter, right from the input
-                  if (typeof option === "string") {
-                    return option;
-                  }
+            {changeDep ? (
+              <Grid item xs={11} sm={8} md={3}>
+                Change Department:
+                <Autocomplete
+                  value={value}
+                  defaultValue={department[0]}
+                  onChange={(event, newValue) => {
+                    if (typeof newValue === "string") {
+                      setValue({
+                        name: newValue,
+                      });
+                    } else if (newValue && newValue.inputValue) {
+                      // Create a new value from the user input
+                      setValue({
+                        name: newValue.inputValue,
+                      });
+                    } else {
+                      setValue(newValue);
+                    }
+                  }}
+                  selectOnFocus
+                  clearOnBlur
+                  handleHomeEndKeys
+                  options={department}
+                  getOptionLabel={(option) => {
+                    // Value selected with enter, right from the input
+                    if (typeof option === "string") {
+                      return option;
+                    }
 
-                  // Regular option
-                  return option.name;
-                }}
-                renderOption={(props, option) => (
-                  <li {...props}>{option.name}</li>
-                )}
-                renderInput={(params) => (
-                  <TextField error={error.parent} {...params} />
-                )}
-              />
-            </Grid>
+                    // Regular option
+                    return option.name;
+                  }}
+                  renderOption={(props, option) => (
+                    <li {...props}>{option.name}</li>
+                  )}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </Grid>
+            ) : (
+              <></>
+            )}
             <Grid item xs={11} sm={8} md={3}>
               Name of Department:
               <TextField

@@ -1,7 +1,18 @@
 import React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button, Grid } from "@mui/material";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  query,
+  collection,
+  where,
+  deleteDoc,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import Typography from "@mui/material/Typography";
@@ -10,6 +21,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import TextField from "@mui/material/TextField";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Dashboard({
   productionId,
@@ -17,13 +30,15 @@ export default function Dashboard({
   setProductionId,
   setProductionCompany,
 }) {
+  const { currentUser } = useAuth();
   const [productionData, setProductionData] = useState({
     name: "",
   });
+  const [position, setPositionData] = useState();
   const [loading, setLoading] = useState();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-
+  const reasonRef = useRef();
   useEffect(() => {
     const getProduction = async () => {
       setLoading(true);
@@ -36,13 +51,23 @@ export default function Dashboard({
             productionCompanyId: res.data().productioncompanyid,
           });
         });
+        const posRef = doc(
+          db,
+          "production",
+          productionId,
+          "position",
+          positionId
+        );
+        await getDoc(posRef).then((res) => {
+          setPositionData(res.data().name);
+        });
       } catch {
         navigate("/production-list");
       }
       setLoading(false);
     };
     getProduction();
-  }, [navigate, productionId]);
+  }, [navigate, positionId, productionId]);
 
   const handleProductionView = () => {
     setProductionId(productionId);
@@ -61,40 +86,59 @@ export default function Dashboard({
 
   const handleClose = (e) => {
     setOpen(false);
+    const updateDocs = async () => {
+      if (e.target.id === "Agree") {
+        // position history
+        const posHisRef = collection(
+          db,
+          "production",
+          productionId,
+          "position",
+          positionId,
+          "positionhistory"
+        );
 
-    if (e.target.id === "Agree") {
-      //Update db
-      navigate("/production-list");
-    }
+        await addDoc(posHisRef, {
+          status: "quit",
+          date: serverTimestamp(),
+          updatedbyid: currentUser.uid,
+          positiondetails: reasonRef.current.value,
+          userid: "",
+        });
+        // deletes position document in userposition
+        const userPosRef = query(
+          collection(db, "user", currentUser.uid, "userposition"),
+          where("positionid", "==", positionId)
+        );
+        console.log(positionId);
+        let id = "";
+        const querySnap = await getDocs(userPosRef);
+        querySnap.forEach((doc) => {
+          id = doc.id;
+        });
+        await deleteDoc(doc(db, "user", currentUser.uid, "userposition", id));
+
+        //update position
+        const posRef = doc(
+          db,
+          "production",
+          productionId,
+          "position",
+          positionId
+        );
+        await updateDoc(posRef, { status: "quit", userid: "" });
+
+        navigate("/production-list");
+      }
+    };
+    updateDocs();
   };
 
   return (
     <div>
       {!loading ? (
         <Grid container>
-          <Button variant="outlined" onClick={handleClickOpen}>
-            Quit
-          </Button>
-          <Dialog
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle id="alert-dialog-title">{"Quit"}</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Are you sure you would like to quit this production?
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button id="Agree" onClick={handleClose} autoFocus>
-                Agree
-              </Button>
-              <Button onClick={handleClose}>Disagree</Button>
-            </DialogActions>
-          </Dialog>
-          <Grid item md={12} textAlign={"center"}>
+          <Grid item xs={12} textAlign={"center"}>
             <Typography
               onClick={handleProductionView}
               style={{ cursor: "pointer" }}
@@ -102,10 +146,40 @@ export default function Dashboard({
             >
               {productionData.name}
             </Typography>
-            <Typography>Dashboard Page</Typography>
+            <Typography>{position}</Typography>
+            <Button variant="outlined" onClick={handleClickOpen}>
+              Quit
+            </Button>
+            <Dialog
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">{"Quit"}</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Are you sure you would like to quit this production?
+                </DialogContentText>
+                <TextField
+                  autoFocus
+                  inputRef={reasonRef}
+                  margin="dense"
+                  label="Reason for quiting(optional)"
+                  type="text"
+                  fullWidth
+                  variant="standard"
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button id="Agree" onClick={handleClose} autoFocus>
+                  Quit Position
+                </Button>
+                <Button onClick={handleClose}>Cancel</Button>
+              </DialogActions>
+            </Dialog>
             <Button onClick={handleCrewPage}>Crew Page</Button>
           </Grid>
-          <>{positionId}</>
         </Grid>
       ) : (
         "loading..."

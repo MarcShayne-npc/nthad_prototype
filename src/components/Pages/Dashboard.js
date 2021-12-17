@@ -76,8 +76,8 @@ export default function Dashboard({
 
   const handleCrewPage = () => {
     setProductionId(productionId);
-    setProductionCompany(productionData.productionCompanyId);
-    navigate("/production-crew-list");
+    setProductionCompany(productionData);
+    navigate("/crew");
   };
 
   const handleClickOpen = () => {

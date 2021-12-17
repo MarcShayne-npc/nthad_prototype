@@ -120,12 +120,7 @@ export default function UserProfile({ userId }) {
     <div>
       {!loading ? (
         <>
-          <Card
-            elevation={10}
-            align="center"
-            variant="outlined"
-            style={cardStyle}
-          >
+          <Card align="center" variant="outlined" style={cardStyle}>
             <Grid
               container
               spacing={1}
@@ -155,12 +150,7 @@ export default function UserProfile({ userId }) {
               </Grid>
             </Grid>
           </Card>
-          <Card
-            elevation={10}
-            align="center"
-            variant="outlined"
-            style={cardStyle2}
-          >
+          <Card align="center" variant="outlined" style={cardStyle2}>
             <Grid container direction="row">
               <Grid item xs={3} sm={2} md={0}>
                 <ButtonGroup variant="text" aria-label="text button group">

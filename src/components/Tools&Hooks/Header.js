@@ -116,8 +116,12 @@ export default function Header() {
     navigate("/edit-profile");
     setOpen(false);
   };
-  const handleProductList = () => {
+  const handleProductionList = () => {
     navigate("/production-list");
+    setOpen(false);
+  };
+  const handlePositionOffers = () => {
+    navigate("/position-offer");
     setOpen(false);
   };
   const handleProducerPage = () => {
@@ -327,7 +331,7 @@ export default function Header() {
         {error && <Alert severity="error">{error}</Alert>}
         <Divider />
         <List>
-          <ListItem button onClick={handleProductList}>
+          <ListItem button onClick={handleProductionList}>
             <ListItemIcon>
               <ListAlt />
             </ListItemIcon>
@@ -335,7 +339,7 @@ export default function Header() {
           </ListItem>
           <Divider />
 
-          <ListItem button onClick={handleProductList}>
+          <ListItem button onClick={handlePositionOffers}>
             <ListItemIcon>
               <ListAlt />
             </ListItemIcon>

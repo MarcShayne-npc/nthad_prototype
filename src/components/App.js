@@ -27,6 +27,8 @@ import EditDepartment from "./Pages/EditDepartment";
 import Dashboard from "./Pages/Dashboard";
 import PositionHistory from "./Pages/PositionHistory";
 import PositionEdit from "./Pages/PositionEdit";
+import Crew from "./Pages/Crew";
+import DepartmentPage from "./Pages/DepartmentPage";
 
 function App() {
   //this is so that I can pass data between components
@@ -203,6 +205,17 @@ function App() {
                   />
                 }
               />
+              <Route
+                path="/crew"
+                element={
+                  <Crew
+                    productionId={productionId}
+                    companyId={productionCompany}
+                    setUserId={setUserId}
+                  />
+                }
+              />
+              <Route path="/department-page" element={<DepartmentPage />} />
             </Route>
           </Routes>
         </Router>

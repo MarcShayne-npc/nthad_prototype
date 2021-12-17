@@ -126,12 +126,7 @@ export default function ProductionProfileView({
   return (
     <div>
       {!loading ? (
-        <Card
-          elevation={0}
-          align="center"
-          variant="outlined"
-          style={cardStyle2}
-        >
+        <Card align="center" variant="outlined" style={cardStyle2}>
           <>
             <Grid
               container

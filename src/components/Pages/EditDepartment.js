@@ -207,10 +207,9 @@ export default function EditDepartment({ departmentId, productionId }) {
           msg: "Production Company Updated",
           key: Math.random(),
         });
-        // setTimeout(() => {
-        //   //set the Alert to Success and display message
-        //   navigate("/production-crew-list");
-        // }, 1000);
+        setTimeout(() => {
+          navigate("/production-crew-list");
+        }, 1000);
       } else {
         //if user required fields are empty
         setError({ name: true });

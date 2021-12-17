@@ -26,6 +26,7 @@ import CreatePosition from "./Pages/CreatePosition";
 import EditDepartment from "./Pages/EditDepartment";
 import Dashboard from "./Pages/Dashboard";
 import PositionHistory from "./Pages/PositionHistory";
+import PositionEdit from "./Pages/PositionEdit";
 
 function App() {
   //this is so that I can pass data between components
@@ -192,6 +193,16 @@ function App() {
                 }
               />
               <Route path="/position-history" element={<PositionHistory />} />
+              <Route
+                path="/position-edit"
+                element={
+                  <PositionEdit
+                    productionId={productionId}
+                    companyId={productionCompany}
+                    positionId={departmentId}
+                  />
+                }
+              />
             </Route>
           </Routes>
         </Router>

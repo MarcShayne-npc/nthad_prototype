@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { Button, Grid, Card } from "@mui/material";
+import { Button, Grid, Card, Typography } from "@mui/material";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
@@ -182,8 +182,9 @@ export default function ProductionCrewList({
       >
         {addPosition ? (
           <>
+            <Typography variant="h5">{nameButton}</Typography>
             <Button onClick={handlePosition} variant="outlined" sx={{ mb: 1 }}>
-              Add Position | {nameButton}
+              Add Position
             </Button>
             <Button onClick={handleEdit} variant="outlined" sx={{ mb: 1 }}>
               Edit
@@ -193,9 +194,15 @@ export default function ProductionCrewList({
           ""
         )}
         {manage ? (
-          <Button onClick={handleManage} variant="outlined" sx={{ mb: 1 }}>
-            Manage | {nameButton}
-          </Button>
+          <>
+            <Typography variant="h5">{nameButton}</Typography>
+            <Button onClick={handleManage} variant="outlined" sx={{ mb: 1 }}>
+              Manage
+            </Button>
+            <Button onClick={handleEditPos} variant="outlined" sx={{ mb: 1 }}>
+              Edit
+            </Button>
+          </>
         ) : (
           ""
         )}
@@ -203,6 +210,14 @@ export default function ProductionCrewList({
       </TreeView>
     );
   };
+
+  const handleEditPos = () => {
+    setDepartmentId(clciked);
+    setProductionCompany(companyId);
+    setProductionId(productionId);
+    navigate("/position-edit");
+  };
+
   const handlePosition = () => {
     setDepartmentId(clciked);
     setProductionCompany(companyId);

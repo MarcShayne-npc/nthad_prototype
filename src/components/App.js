@@ -170,6 +170,10 @@ function App() {
                   <ProductionOffer
                     productionId={productionId}
                     positionId={positionId}
+                    setProductionId={setProductionId}
+                    setDepartmentId={setDepartmentId}
+                    setPositionId={setPositionId}
+                    setProductionCompany={setProductionCompany}
                   />
                 }
               />

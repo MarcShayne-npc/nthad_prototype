@@ -37,6 +37,7 @@ export default function EditDepartment({ departmentId, productionId }) {
   const [value, setValue] = useState(null);
   const [changeDep, setChangeDep] = useState(true);
   //This is for the autocomplete section in the department
+
   useEffect(() => {
     const getDepartment = async () => {
       setLoading(true);

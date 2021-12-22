@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { Button, Grid, Card } from "@mui/material";
+import { Button, Grid, Card, Typography } from "@mui/material";
 import {
   doc,
   getDoc,
@@ -12,10 +12,10 @@ import {
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import TreeView from "@mui/lab/TreeView";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import TreeItem from "@mui/lab/TreeItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import MovieFilterIcon from "@mui/icons-material/MovieFilter";
 
 export default function ProductionCompanyDashboard({
   companyId,
@@ -37,6 +37,7 @@ export default function ProductionCompanyDashboard({
   });
   const [productionOwned, setproductionOwned] = useState([]);
   const [proCoId, setProCoId] = useState("");
+  const [productionList, setProductionList] = useState([]);
 
   useEffect(() => {
     const getProductionCompany = async () => {
@@ -72,30 +73,13 @@ export default function ProductionCompanyDashboard({
         name: "Production",
         children: arr2,
       });
+      setProductionList(arr2);
       //When all is done set loading to false
       setLoading(false);
     };
 
     getProductionCompany();
   }, [companyId, userUid]);
-
-  //Mui dynamic rending for Treeitems Read more on https://mui.com/components/tree-view/#main-content
-  const renderTree = (nodes) => (
-    <TreeItem
-      key={nodes.id}
-      nodeId={nodes.id}
-      label={nodes.name}
-      style={
-        nodes.id.includes("root")
-          ? { backgroundColor: "#5040a0", color: "white" }
-          : { backgroundColor: "white", color: "black" }
-      }
-    >
-      {Array.isArray(nodes.children)
-        ? nodes.children.map((node) => renderTree(node))
-        : null}
-    </TreeItem>
-  );
 
   useEffect(() => {
     const getProductionCompany = async () => {
@@ -129,26 +113,32 @@ export default function ProductionCompanyDashboard({
     navigate("/production-company-profile");
   };
 
-  function action(event, nodeId) {
-    let x = "";
+  function action(event) {
+    const x = event.target.id - 1;
     let y = false;
-    if (!nodeId.includes("root")) {
-      console.log(nodeId);
-      x = JSON.parse(nodeId) - 1;
-      //checks if the Production is owned in the array
-      y = productionOwned.includes(data.children[x].docId);
-    }
+
+    //checks if the Production is owned in the array
+    y = productionOwned.includes(data.children[x].docId);
+
     //if owned then redirect to the production-dashboard
-    if (!nodeId.includes("root") && y) {
+    if (y) {
       setProductionId(data.children[x].docId);
       navigate("/production-dashboard");
       //if not the redirect to production profile view
-    } else if (!nodeId.includes("root")) {
+    } else {
       setProductionCompany(proCoId);
       setProductionId(data.children[x].docId);
       navigate("/production-profile-view");
     }
   }
+
+  const renderList2 = productionList.map((items) => (
+    <ListItem key={items.id} disablePadding>
+      <ListItemButton id={items.id} onClick={action} sx={{ border: 1, mb: 1 }}>
+        {items.name}
+      </ListItemButton>
+    </ListItem>
+  ));
 
   return (
     <div>
@@ -161,17 +151,17 @@ export default function ProductionCompanyDashboard({
             marginBottom={1}
           >
             <Grid item xs={12} textAlign="center">
-              <h2>{companyData.name}</h2>
+              <Typography variant="h3">{companyData.name}</Typography>
             </Grid>
           </Grid>
           <Grid container direction="row" marginBottom={1}>
             <Grid item xs={12} textAlign="center">
               <Button variant="outlined" onClick={handleProfileView}>
-                View Profile
+                View Company
               </Button>
 
               <Button variant="outlined" onClick={handleEditProfile}>
-                Edit Profile
+                Edit Company
               </Button>
             </Grid>
           </Grid>
@@ -188,21 +178,21 @@ export default function ProductionCompanyDashboard({
                 variant="outlined"
                 style={{ padding: 20 }}
               >
-                <TreeView
-                  aria-label="rich object"
-                  defaultCollapseIcon={<ExpandMoreIcon />}
-                  defaultExpanded={["root"]}
-                  defaultExpandIcon={<ChevronRightIcon />}
-                  sx={{
-                    height: 200,
-                    flexGrow: 1,
-                    maxWidth: 400,
-                    overflowY: "auto",
-                  }}
-                  onNodeSelect={action}
+                <Grid
+                  container
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
                 >
-                  {renderTree(data)}
-                </TreeView>
+                  <Grid item>
+                    <MovieFilterIcon fontSize="large" />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="h5">Production:</Typography>
+                  </Grid>
+                </Grid>
+
+                <List>{renderList2}</List>
               </Card>
             </Grid>
           </Grid>

@@ -150,6 +150,7 @@ function App() {
                     setProductionId={setProductionId}
                     setProductionCompany={setProductionCompany}
                     setDepartmentId={setDepartmentId}
+                    setPositionId={setPositionId}
                   />
                 }
               />
@@ -163,7 +164,15 @@ function App() {
                   />
                 }
               />
-              <Route path="/production-offer" element={<ProductionOffer />} />
+              <Route
+                path="/production-offer"
+                element={
+                  <ProductionOffer
+                    productionId={productionId}
+                    positionId={positionId}
+                  />
+                }
+              />
               <Route
                 path="/position-create"
                 element={

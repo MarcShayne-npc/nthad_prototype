@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { Button, Grid, Card, Typography, Avatar } from "@mui/material";
+import { Grid, Card, Typography, Avatar } from "@mui/material";
 import { collection, getDocs, getDoc, doc } from "firebase/firestore";
 import { db, storage } from "../../firebase";
 import { useNavigate } from "react-router-dom";

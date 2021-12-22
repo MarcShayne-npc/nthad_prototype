@@ -4,28 +4,13 @@ import { query, collection, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@mui/material";
-import TreeView from "@mui/lab/TreeView";
-import TreeItem from "@mui/lab/TreeItem";
-import SvgIcon from "@mui/material/SvgIcon";
-
-//Mui components for treeview https://mui.com/components/tree-view/
-function PlusSquare(props) {
-  return (
-    <SvgIcon fontSize="inherit" style={{ width: 14, height: 14 }} {...props}>
-      {/* tslint:disable-next-line: max-line-length */}
-      <path d="M22.047 22.074v0 0-20.147 0h-20.12v0 20.147 0h20.12zM22.047 24h-20.12q-.803 0-1.365-.562t-.562-1.365v-20.147q0-.776.562-1.351t1.365-.575h20.147q.776 0 1.351.575t.575 1.351v20.147q0 .803-.575 1.365t-1.378.562v0zM17.873 12.977h-4.923v4.896q0 .401-.281.682t-.682.281v0q-.375 0-.669-.281t-.294-.682v-4.896h-4.923q-.401 0-.682-.294t-.281-.669v0q0-.401.281-.682t.682-.281h4.923v-4.896q0-.401.294-.682t.669-.281v0q.401 0 .682.281t.281.682v4.896h4.923q.401 0 .682.281t.281.682v0q0 .375-.281.669t-.682.294z" />
-    </SvgIcon>
-  );
-}
-function MinusSquare(props) {
-  return (
-    <SvgIcon fontSize="inherit" style={{ width: 14, height: 14 }} {...props}>
-      {/* tslint:disable-next-line: max-line-length */}
-      <path d="M22.047 22.074v0 0-20.147 0h-20.12v0 20.147 0h20.12zM22.047 24h-20.12q-.803 0-1.365-.562t-.562-1.365v-20.147q0-.776.562-1.351t1.365-.575h20.147q.776 0 1.351.575t.575 1.351v20.147q0 .803-.575 1.365t-1.378.562v0zM17.873 11.023h-11.826q-.375 0-.669.281t-.294.682v0q0 .401.294 .682t.669.281h11.826q.375 0 .669-.281t.294-.682v0q0-.401-.294-.682t-.669-.281z" />
-    </SvgIcon>
-  );
-}
+import { Button, Card, Typography, Grid } from "@mui/material";
+import ListItemButton from "@mui/material/ListItemButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import AddIcon from "@mui/icons-material/Add";
+import MovieFilterIcon from "@mui/icons-material/MovieFilter";
 
 export default function ProducerPage({
   setProductionCompany,
@@ -42,13 +27,14 @@ export default function ProducerPage({
     children: [{ id: "1", name: "Company Name", docId: "" }],
   });
 
-  const [data3, setData3] = useState({
+  const [data2, setData2] = useState({
     id: "root",
     name: "Production Company Owned",
     children: [{ id: "1", name: "Company Name", docId: "" }],
   });
   const [loading, setLoading] = useState(true);
-
+  const [companyList, setCompanyList] = useState([]);
+  const [productionList, setProductionList] = useState([]);
   //When page load setLoading to true
   //Get Production Company owned & production Owned
   useEffect(() => {
@@ -96,7 +82,8 @@ export default function ProducerPage({
         });
         i++;
       });
-
+      setCompanyList(arr);
+      setProductionList(arr2);
       //sets the Data for all the array elements in arry
       setData({
         id: "root",
@@ -104,7 +91,7 @@ export default function ProducerPage({
         children: arr,
       });
 
-      setData3({
+      setData2({
         id: "root2",
         name: "Production Owned",
         children: arr2,
@@ -116,77 +103,99 @@ export default function ProducerPage({
     getProductionCompany();
   }, [userUid]);
 
-  //Mui dynamic rending for Treeitems Read more on https://mui.com/components/tree-view/#main-content
-  const renderTree = (nodes) => (
-    <TreeItem
-      key={nodes.id}
-      nodeId={nodes.id}
-      label={nodes.name}
-      style={
-        nodes.id.includes("root")
-          ? { backgroundColor: "#5040a0", color: "white" }
-          : { backgroundColor: "white", color: "black" }
-      }
-    >
-      {Array.isArray(nodes.children)
-        ? nodes.children.map((node) => renderTree(node))
-        : null}
-    </TreeItem>
-  );
-  //When the Production Company tree item is selected
-  //Get's the Node name and set's to global variabl to be used later
-  function action(event, nodeId) {
-    if (nodeId !== "root") {
-      const x = JSON.parse(nodeId) - 1;
-      const companyNameRef = data.children[x].docId;
-      setProductionCompany(companyNameRef);
-      navigate("/production-company-dashboard");
-    }
+  //when list is pressed get comapny id of the array
+  //then setState of production id
+  function action(e) {
+    const x = e.target.id - 1;
+    setProductionCompany(data.children[x].docId);
+    navigate("/production-company-dashboard");
   }
-  function action2(event, nodeId) {
-    if (nodeId !== "root2") {
-      const x = JSON.parse(nodeId) - 1;
-      setProductionId(data3.children[x].proId);
-      navigate("/production-dashboard");
-    }
+
+  function action2(e) {
+    const x = e.target.id - 1;
+    setProductionId(data2.children[x].proId);
+    navigate("/production-dashboard");
   }
   const handleProductionCompanyProfileCreate = () => {
     navigate("/production-company-profile-create");
   };
 
+  const renderList = companyList.map((items) => (
+    <ListItem key={items.id} disablePadding>
+      <ListItemButton id={items.id} onClick={action} sx={{ border: 1 }}>
+        {items.name}
+      </ListItemButton>
+    </ListItem>
+  ));
+
+  const renderList2 = productionList.map((items) => (
+    <ListItem key={items.id} disablePadding>
+      <ListItemButton id={items.id} onClick={action2} sx={{ border: 1, mb: 1 }}>
+        {items.name}
+      </ListItemButton>
+    </ListItem>
+  ));
+
   return (
     <div>
       {!loading ? (
         <>
-          <TreeView
-            aria-label="customized"
-            defaultExpanded={["root"]}
-            defaultCollapseIcon={<MinusSquare />}
-            defaultExpandIcon={<PlusSquare />}
-            multiSelect={false}
-            sx={{
-              height: 200,
-              flexGrow: 1,
-              maxWidth: 400,
-              overflowY: "auto",
-            }}
-            onNodeSelect={action}
-          >
-            {renderTree(data)}
-            <Button onClick={handleProductionCompanyProfileCreate}>
-              Create New Company
-            </Button>
-          </TreeView>
-          <TreeView
-            aria-label="rich object"
-            defaultCollapseIcon={<MinusSquare />}
-            defaultExpandIcon={<PlusSquare />}
-            defaultExpanded={["root2"]}
-            sx={{ height: 200, flexGrow: 1, maxWidth: 400, overflowY: "auto" }}
-            onNodeSelect={action2}
-          >
-            {renderTree(data3)}
-          </TreeView>
+          <Grid container spacing={2} direction="column" md={4}>
+            <Grid item>
+              <Card
+                elevation={0}
+                align="center"
+                variant="outlined"
+                style={{ padding: 20 }}
+              >
+                <Grid
+                  container
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Grid item>
+                    <ApartmentIcon fontSize="large" />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="h5">
+                      Production Company Owned:
+                    </Typography>
+                  </Grid>
+                </Grid>
+
+                <List>{renderList}</List>
+                <Button onClick={handleProductionCompanyProfileCreate}>
+                  <AddIcon />
+                  Create New Company
+                </Button>
+              </Card>
+            </Grid>
+            <Grid item>
+              <Card
+                elevation={0}
+                align="center"
+                variant="outlined"
+                style={{ padding: 20 }}
+              >
+                <Grid
+                  container
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Grid item>
+                    <MovieFilterIcon fontSize="large" />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="h5">Production Owned:</Typography>
+                  </Grid>
+                </Grid>
+
+                <List>{renderList2}</List>
+              </Card>
+            </Grid>
+          </Grid>
         </>
       ) : (
         "loading..."

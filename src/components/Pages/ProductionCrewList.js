@@ -1,12 +1,10 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { Button, Grid, Card, Typography } from "@mui/material";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import TreeView from "@mui/lab/TreeView";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TreeItem from "@mui/lab/TreeItem";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -14,6 +12,49 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import List from "@mui/material/List";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
+import SvgIcon from "@mui/material/SvgIcon";
+
+const useStyles = makeStyles({
+  label: {
+    backgroundColor: "#2a3eb1",
+    color: "White",
+    marginTop: 5,
+  },
+  group: {
+    borderLeft: `1px double`,
+  },
+  group2: {
+    borderLeft: `1px double`,
+  },
+  label2: {
+    backgroundColor: "#3d5afe",
+    color: "White",
+    marginTop: 5,
+  },
+  label3: {
+    backgroundColor: "#637bfe",
+    color: "White",
+  },
+});
+
+function MinusSquare(props) {
+  return (
+    <SvgIcon fontSize="inherit" style={{ width: 14, height: 14 }} {...props}>
+      {/* tslint:disable-next-line: max-line-length */}
+      <path d="M22.047 22.074v0 0-20.147 0h-20.12v0 20.147 0h20.12zM22.047 24h-20.12q-.803 0-1.365-.562t-.562-1.365v-20.147q0-.776.562-1.351t1.365-.575h20.147q.776 0 1.351.575t.575 1.351v20.147q0 .803-.575 1.365t-1.378.562v0zM17.873 11.023h-11.826q-.375 0-.669.281t-.294.682v0q0 .401.294 .682t.669.281h11.826q.375 0 .669-.281t.294-.682v0q0-.401-.294-.682t-.669-.281z" />
+    </SvgIcon>
+  );
+}
+
+function PlusSquare(props) {
+  return (
+    <SvgIcon fontSize="inherit" style={{ width: 14, height: 14 }} {...props}>
+      {/* tslint:disable-next-line: max-line-length */}
+      <path d="M22.047 22.074v0 0-20.147 0h-20.12v0 20.147 0h20.12zM22.047 24h-20.12q-.803 0-1.365-.562t-.562-1.365v-20.147q0-.776.562-1.351t1.365-.575h20.147q.776 0 1.351.575t.575 1.351v20.147q0 .803-.575 1.365t-1.378.562v0zM17.873 12.977h-4.923v4.896q0 .401-.281.682t-.682.281v0q-.375 0-.669-.281t-.294-.682v-4.896h-4.923q-.401 0-.682-.294t-.281-.669v0q0-.401.281-.682t.682-.281h4.923v-4.896q0-.401.294-.682t.669-.281v0q.401 0 .682.281t.281.682v4.896h4.923q.401 0 .682.281t.281.682v0q0 .375-.281.669t-.682.294z" />
+    </SvgIcon>
+  );
+}
 
 export default function ProductionCrewList({
   productionId,
@@ -21,10 +62,14 @@ export default function ProductionCrewList({
   setProductionId,
   setProductionCompany,
   setDepartmentId,
+  setPositionId,
 }) {
   //Mui dynamic rending for Treeitems Read more on https://mui.com/components/tree-view/#main-content
   const navigate = useNavigate();
-
+  const classes = useStyles();
+  const [productionData, setProductionData] = useState({
+    name: "",
+  });
   const [loading, setLoading] = useState(false);
   //Data for treeview
   const [data, setData] = useState([]);
@@ -44,6 +89,10 @@ export default function ProductionCrewList({
   //Anchor for the Filter Button
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  //Array of the filtered Items
+  const [filter, setFilter] = useState([]);
+  //when Filter is active or not
+  const [activeFilter, setActiveFilter] = useState(false);
 
   useEffect(() => {
     const getDepartment = async () => {
@@ -136,6 +185,13 @@ export default function ProductionCrewList({
           const obj1 = arr.findIndex((el) => el.docId === child.parentid);
           arr[obj1].children = [...arr[obj1].children, child];
         });
+        const docRef = doc(db, "production", productionId);
+        //gets the name of production
+        await getDoc(docRef).then((res) => {
+          setProductionData({
+            name: res.data().name,
+          });
+        });
         setPos(arr3);
         setSub(arr2);
         setData(arr);
@@ -160,12 +216,12 @@ export default function ProductionCrewList({
           nodeId={treeItemData.id}
           label={treeItemData.name}
           children={children}
-          style={
+          classes={
             treeItemData.id.includes("root")
-              ? { backgroundColor: "#673ab7", color: "white" }
+              ? { label: classes.label, group: classes.group }
               : treeItemData.id.includes("Parent")
-              ? { backgroundColor: "#3f51b5", color: "white" }
-              : { backgroundColor: "#2196f3", color: "white" }
+              ? { label: classes.label2, group: classes.group2 }
+              : { label: classes.label3 }
           }
         />
       );
@@ -175,8 +231,8 @@ export default function ProductionCrewList({
   const DataTreeView = ({ treeItems }) => {
     return (
       <TreeView
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
+        defaultCollapseIcon={<MinusSquare />}
+        defaultExpandIcon={<PlusSquare />}
         defaultExpanded={expName}
         onNodeSelect={action}
       >
@@ -225,6 +281,8 @@ export default function ProductionCrewList({
     navigate("/position-create");
   };
   const handleManage = () => {
+    setProductionId(productionId);
+    setPositionId(clciked);
     navigate("/production-offer");
   };
   const handleEdit = () => {
@@ -276,10 +334,6 @@ export default function ProductionCrewList({
   const handleClose = () => {
     setAnchorEl(null);
   };
-  //Array of the filtered Items
-  const [filter, setFilter] = useState([]);
-  //when Filter is active or not
-  const [activeFilter, setActiveFilter] = useState(false);
   //When filter is not active close Filter Card
   const handleActiveFilter = () => {
     setActiveFilter(false);
@@ -324,7 +378,7 @@ export default function ProductionCrewList({
       <Grid container justifyContent="center" direction="row" marginBottom={1}>
         {!loading ? (
           <Grid item textAlign={"center"} xs={12}>
-            {productionId}
+            <Typography variant="h3">{productionData.name}</Typography>
           </Grid>
         ) : (
           ""

@@ -34,7 +34,9 @@ export default function PositionEdit({ productionId, companyId, positionId }) {
   //value in the auto-complete textfield
   const [value, setValue] = useState(null);
   const [isHead, setIsHead] = useState(false);
-
+  console.log(productionId);
+  console.log(companyId);
+  console.log(positionId);
   useEffect(() => {
     const getDepartment = async () => {
       setLoading(true);

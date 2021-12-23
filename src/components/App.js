@@ -214,7 +214,7 @@ function App() {
                   <PositionEdit
                     productionId={productionId}
                     companyId={productionCompany}
-                    positionId={departmentId}
+                    positionId={positionId}
                   />
                 }
               />

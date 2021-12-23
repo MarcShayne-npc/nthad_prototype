@@ -139,31 +139,23 @@ export default function ProducerPage({
   return (
     <div>
       {!loading ? (
-        <>
-          <Grid container spacing={2} direction="column" md={4}>
-            <Grid item>
-              <Card
-                elevation={0}
-                align="center"
-                variant="outlined"
-                style={{ padding: 20 }}
-              >
-                <Grid
-                  container
-                  direction="row"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <Grid item>
-                    <ApartmentIcon fontSize="large" />
-                  </Grid>
-                  <Grid item>
-                    <Typography variant="h5">
-                      Production Company Owned:
-                    </Typography>
-                  </Grid>
+        <Grid>
+          <Grid
+            container
+            spacing={2}
+            justifyContent="center"
+            columns={{ xs: 4, sm: 8, md: 12 }}
+          >
+            <Grid item xs={4} sm={4} md={4}>
+              <Card align="center" variant="outlined" style={{ padding: 20 }}>
+                <Grid item>
+                  <ApartmentIcon fontSize="large" />
                 </Grid>
-
+                <Grid item>
+                  <Typography variant="h5">
+                    Production Company Owned:
+                  </Typography>
+                </Grid>
                 <List>{renderList}</List>
                 <Button onClick={handleProductionCompanyProfileCreate}>
                   <AddIcon />
@@ -171,32 +163,19 @@ export default function ProducerPage({
                 </Button>
               </Card>
             </Grid>
-            <Grid item>
-              <Card
-                elevation={0}
-                align="center"
-                variant="outlined"
-                style={{ padding: 20 }}
-              >
-                <Grid
-                  container
-                  direction="row"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <Grid item>
-                    <MovieFilterIcon fontSize="large" />
-                  </Grid>
-                  <Grid item>
-                    <Typography variant="h5">Production Owned:</Typography>
-                  </Grid>
+            <Grid item xs={4} sm={4} md={4}>
+              <Card align="center" variant="outlined" style={{ padding: 20 }}>
+                <Grid item>
+                  <MovieFilterIcon fontSize="large" />
                 </Grid>
-
+                <Grid item>
+                  <Typography variant="h5">Production Owned:</Typography>
+                </Grid>
                 <List>{renderList2}</List>
               </Card>
             </Grid>
           </Grid>
-        </>
+        </Grid>
       ) : (
         "loading..."
       )}

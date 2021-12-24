@@ -23,6 +23,7 @@ import {
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import AlertMessage from "../Tools&Hooks/AlertMessage";
 
 export default function ProductionOffer({
   productionId,
@@ -57,12 +58,16 @@ export default function ProductionOffer({
   const [productionData, setProductionData] = useState({
     name: "",
   });
+  const [status, setStatusBase] = useState("");
+
   //id is document id of user/userposition
   //userId is document id of user in the position
   const [userPositionId, setUserPositionId] = useState({
     id: "",
     userId: "",
   });
+  const [isHead, setIsHead] = useState(false);
+
   useEffect(() => {
     const getOffer = async () => {
       setLoading(true);
@@ -111,6 +116,7 @@ export default function ProductionOffer({
             departmentName: res.data().departmentname,
             departmentId: res.data().departmentid,
           });
+          setIsHead(res.data().isdepartmenthead);
           userId = res.data().userid;
           status = res.data().status;
         });
@@ -298,7 +304,87 @@ export default function ProductionOffer({
     navigate("/production-crew-list");
   };
 
-  const handleTerminated = async () => {};
+  const handleTerminated = async () => {
+    if (isHead !== true) {
+      const posRef = doc(
+        db,
+        "production",
+        productionId,
+        "position",
+        positionId
+      );
+      const hisRef = collection(
+        db,
+        "production",
+        productionId,
+        "position",
+        positionId,
+        "positionhistory"
+      );
+      const userPosRef = doc(
+        db,
+        "user",
+        userPositionId.userId,
+        "userposition",
+        userPositionId.id
+      );
+      await updateDoc(posRef, {
+        status: "terminated",
+        userid: "",
+      });
+
+      await addDoc(hisRef, {
+        status: "terminated",
+        date: serverTimestamp(),
+        updatedbyid: currentUser.uid,
+        positiondetails: "",
+        userid: userPositionId.userId,
+      });
+      await deleteDoc(userPosRef);
+
+      navigate("/production-crew-list");
+    } else {
+      setStatusBase({
+        lvl: "error",
+        msg: "Must change department head before removing this position",
+        key: Math.random(),
+      });
+    }
+  };
+
+  const handleComplete = async () => {
+    const posRef = doc(db, "production", productionId, "position", positionId);
+    const hisRef = collection(
+      db,
+      "production",
+      productionId,
+      "position",
+      positionId,
+      "positionhistory"
+    );
+    const userPosRef = doc(
+      db,
+      "user",
+      userPositionId.userId,
+      "userposition",
+      userPositionId.id
+    );
+    await updateDoc(posRef, {
+      status: "completed",
+      userid: "",
+    });
+
+    await addDoc(hisRef, {
+      status: "completed",
+      date: serverTimestamp(),
+      updatedbyid: currentUser.uid,
+      positiondetails: "",
+      userid: userPositionId.userId,
+    });
+    await deleteDoc(userPosRef);
+
+    navigate("/production-crew-list");
+  };
   return (
     <div>
       {!loading ? (
@@ -309,6 +395,13 @@ export default function ProductionOffer({
           justifyContent="center"
           spacing={1}
         >
+          {status ? (
+            <AlertMessage
+              level={status.lvl}
+              key={status.key}
+              message={status.msg}
+            />
+          ) : null}
           <Grid item xs={12} textAlign="center">
             <Typography
               onClick={handleDepartment}
@@ -374,7 +467,9 @@ export default function ProductionOffer({
             )}
             {completeBtn ? (
               <Grid item xs={5} md={2} textAlign="center">
-                <Button variant="outlined">Complete</Button>
+                <Button onClick={handleComplete} variant="outlined">
+                  Complete
+                </Button>
               </Grid>
             ) : (
               <></>

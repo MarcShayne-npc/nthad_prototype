@@ -86,7 +86,7 @@ export default function PositionEdit({ productionId, companyId, positionId }) {
         }
       } catch (err) {
         console.log(err);
-        //navigate("/producer-page");
+        navigate("/producer-page");
       }
       setLoading(false);
     };

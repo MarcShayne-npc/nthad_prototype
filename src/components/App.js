@@ -207,7 +207,15 @@ function App() {
                   />
                 }
               />
-              <Route path="/position-history" element={<PositionHistory />} />
+              <Route
+                path="/position-history"
+                element={
+                  <PositionHistory
+                    positionId={positionId}
+                    productionId={productionId}
+                  />
+                }
+              />
               <Route
                 path="/position-edit"
                 element={

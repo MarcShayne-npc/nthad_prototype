@@ -385,6 +385,12 @@ export default function ProductionOffer({
 
     navigate("/production-crew-list");
   };
+
+  const handlePosHis = () => {
+    setProductionId(productionId);
+    setPositionId(positionId);
+    navigate("/position-history");
+  };
   return (
     <div>
       {!loading ? (
@@ -426,7 +432,9 @@ export default function ProductionOffer({
             </Typography>
           </Grid>
           <Grid item xs={5} md={2} textAlign="center" sx={{ mb: 1 }}>
-            <Button variant="outlined">Position History </Button>
+            <Button onClick={handlePosHis} variant="outlined">
+              Position History{" "}
+            </Button>
           </Grid>
           <Grid
             container

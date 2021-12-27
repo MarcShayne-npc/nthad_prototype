@@ -213,6 +213,7 @@ function App() {
                   <PositionHistory
                     positionId={positionId}
                     productionId={productionId}
+                    setUserId={setUserId}
                   />
                 }
               />

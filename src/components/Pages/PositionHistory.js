@@ -2,42 +2,22 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
-import { Avatar, Typography } from "@mui/material";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { Avatar, Typography, Link } from "@mui/material";
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 
-const columns = [
-  {
-    field: "avatar",
-    headerName: "Avatar",
-    width: 80,
-    renderCell: (params) => <Avatar src={params.value} alt="ProfilePic" />,
-  },
-  {
-    field: "displayName",
-    headerName: "Display Name",
-    width: 130,
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    width: 75,
-  },
-  {
-    field: "date",
-    headerName: "Date",
-    type: "dateTime",
-    width: 230,
-  },
-  {
-    field: "details",
-    headerName: "Details",
-    minWidth: 600,
-    flex: 1,
-  },
-];
-
-export default function PositionHistory({ productionId, positionId }) {
+export default function PositionHistory({
+  productionId,
+  positionId,
+  setUserId,
+}) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [data, setData] = useState({
@@ -48,6 +28,64 @@ export default function PositionHistory({ productionId, positionId }) {
     details: "",
   });
   const [positionData, setPositionData] = useState({});
+
+  const columns = [
+    {
+      field: "avatar",
+      headerName: "Avatar",
+      width: 80,
+      renderCell: (params) => <Avatar src={params.value} alt="ProfilePic" />,
+    },
+    {
+      field: "displayName",
+      headerName: "Display Name",
+      width: 130,
+      renderCell: (params) => (
+        <Link
+          color="inherit"
+          underline="none"
+          onClick={() => {
+            handleProfile(params.value);
+          }}
+        >
+          {params.value}
+        </Link>
+      ),
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 75,
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      type: "dateTime",
+      width: 230,
+    },
+    {
+      field: "details",
+      headerName: "Details",
+      minWidth: 600,
+      flex: 1,
+    },
+  ];
+
+  const handleProfile = async (name) => {
+    const userRef = query(
+      collection(db, "user"),
+      where("displayname", "==", name)
+    );
+
+    const user = await getDocs(userRef);
+    let userId = "";
+    user.forEach((doc) => {
+      userId = doc.id;
+    });
+    setUserId(userId);
+    navigate("/user-profile");
+  };
+
   useEffect(() => {
     const getHistory = async () => {
       setLoading(true);
@@ -134,6 +172,7 @@ export default function PositionHistory({ productionId, positionId }) {
     };
     getHistory();
   }, [navigate, positionId, productionId]);
+
   return (
     <div style={{ height: 400, width: "100%" }}>
       {!loading ? (

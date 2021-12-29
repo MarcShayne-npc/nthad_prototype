@@ -29,6 +29,9 @@ import PositionHistory from "./Pages/PositionHistory";
 import PositionEdit from "./Pages/PositionEdit";
 import Crew from "./Pages/Crew";
 import DepartmentPage from "./Pages/DepartmentPage";
+import PositionOffer from "./Pages/PositionOffer";
+import OfferInformation from "./Pages/OfferInformation";
+import UserPositionHistory from "./Pages/UserPositionHistory";
 
 function App() {
   //this is so that I can pass data between components
@@ -238,6 +241,32 @@ function App() {
                 }
               />
               <Route path="/department-page" element={<DepartmentPage />} />
+              <Route
+                path="/position-offer"
+                element={
+                  <PositionOffer
+                    setProductionCompany={setProductionCompany}
+                    setProductionId={setProductionId}
+                  />
+                }
+              />
+              <Route
+                path="/offer-information"
+                element={
+                  <OfferInformation
+                    companyId={productionCompany}
+                    productionId={productionId}
+                    positionId={positionId}
+                    setProductionId={setProductionId}
+                    setProductionCompany={setProductionCompany}
+                    setUserId={setUserId}
+                  />
+                }
+              />
+              <Route
+                path="/user-position-history"
+                element={<UserPositionHistory />}
+              />
             </Route>
           </Routes>
         </Router>

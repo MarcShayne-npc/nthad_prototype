@@ -28,7 +28,6 @@ import {
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import AlertMessage from "../Tools&Hooks/AlertMessage";
 
 export default function OfferInformation({
   companyId,

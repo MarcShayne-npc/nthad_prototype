@@ -12,6 +12,8 @@ import ListItem from "@mui/material/ListItem";
 export default function PositionOffer({
   setProductionId,
   setProductionCompany,
+  setDepartmentId,
+  setPositionId,
 }) {
   const { currentUser } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -39,6 +41,8 @@ export default function PositionOffer({
           id: doc.id,
           productionId: doc.data().productionid,
           companyId: doc.data().productioncompanyid,
+          departmentid: doc.data().departmentid,
+          positionid: doc.data().positionid,
         });
       });
       setOffer(arr2);
@@ -52,6 +56,8 @@ export default function PositionOffer({
   const action = (e) => {
     const found = offer.find(({ id }) => id === e.target.id);
     console.log(found);
+    setPositionId(found.positionid);
+    setDepartmentId(found.departmentid);
     setProductionCompany(found.companyId);
     setProductionId(found.productionId);
     navigate("/offer-information");

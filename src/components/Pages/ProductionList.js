@@ -106,7 +106,8 @@ export default function ProductionList({ setProductionId, setPositionId }) {
   const action = async (event, nodes) => {
     const q = query(
       collection(db, "production", nodes, "position"),
-      where("userid", "==", currentUser.uid)
+      where("userid", "==", currentUser.uid),
+      where("status", "!=", "offered")
     );
 
     const querySnapshot = await getDocs(q);
@@ -114,6 +115,7 @@ export default function ProductionList({ setProductionId, setPositionId }) {
     let arr = [];
     let arr2 = [];
     querySnapshot.forEach((doc) => {
+      console.log(doc.data());
       arr.push({
         id: doc.id,
         name: doc.data().name,

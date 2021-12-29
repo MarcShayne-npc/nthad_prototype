@@ -34,7 +34,8 @@ import OfferInformation from "./Pages/OfferInformation";
 import UserPositionHistory from "./Pages/UserPositionHistory";
 
 function App() {
-  //this is so that I can pass data between components
+  //lifting state
+  //https://reactjs.org/docs/lifting-state-up.html
   const [productionCompany, setProductionCompany] = useState("");
   const [productionId, setProductionId] = useState("");
   const [userId, setUserId] = useState("");
@@ -247,6 +248,8 @@ function App() {
                   <PositionOffer
                     setProductionCompany={setProductionCompany}
                     setProductionId={setProductionId}
+                    setDepartmentId={setDepartmentId}
+                    setPositionId={setPositionId}
                   />
                 }
               />
@@ -257,6 +260,7 @@ function App() {
                     companyId={productionCompany}
                     productionId={productionId}
                     positionId={positionId}
+                    departmentId={departmentId}
                     setProductionId={setProductionId}
                     setProductionCompany={setProductionCompany}
                     setUserId={setUserId}

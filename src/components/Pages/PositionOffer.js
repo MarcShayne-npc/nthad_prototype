@@ -55,7 +55,7 @@ export default function PositionOffer({
 
   const action = (e) => {
     const found = offer.find(({ id }) => id === e.target.id);
-    console.log(found);
+
     setPositionId(found.positionid);
     setDepartmentId(found.departmentid);
     setProductionCompany(found.companyId);

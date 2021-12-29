@@ -43,7 +43,6 @@ const LogIn = () => {
         firebase.auth().currentUser.metadata.creationTime ===
         firebase.auth().currentUser.metadata.lastSignInTime
       ) {
-        console.log("first time");
         navigate("/edit-profile");
       } else {
         navigate("/production-list");
@@ -67,12 +66,10 @@ const LogIn = () => {
           firebase.auth().currentUser.metadata.creationTime ===
           firebase.auth().currentUser.metadata.lastSignInTime
         ) {
-          console.log("first time");
           navigate("/edit-profile");
         } else {
           navigate("/production-list");
         }
-        console.log("Login");
       })
       .catch((er) => {
         setError("Failed to sign in with Google");
@@ -91,12 +88,10 @@ const LogIn = () => {
           firebase.auth().currentUser.metadata.creationTime ===
           firebase.auth().currentUser.metadata.lastSignInTime
         ) {
-          console.log("first time");
           navigate("/edit-profile");
         } else {
           navigate("/production-list");
         }
-        console.log("Login");
       })
       .catch((er) => {
         setError("Failed to sign in with Facebook");

@@ -76,7 +76,7 @@ export default function OfferInformation({
             name: res.data().name,
           });
         });
-        console.log(departmentId);
+
         const departmentRef = doc(
           db,
           "production",

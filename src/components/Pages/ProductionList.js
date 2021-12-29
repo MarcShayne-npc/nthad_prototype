@@ -115,14 +115,13 @@ export default function ProductionList({ setProductionId, setPositionId }) {
     let arr = [];
     let arr2 = [];
     querySnapshot.forEach((doc) => {
-      console.log(doc.data());
       arr.push({
         id: doc.id,
         name: doc.data().name,
       });
       arr2.push(doc.data().departmentname);
     });
-    console.log(arr);
+
     let arr3 = [];
     let i = 0;
 

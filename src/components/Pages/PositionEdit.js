@@ -34,9 +34,7 @@ export default function PositionEdit({ productionId, companyId, positionId }) {
   //value in the auto-complete textfield
   const [value, setValue] = useState(null);
   const [isHead, setIsHead] = useState(false);
-  console.log(productionId);
-  console.log(companyId);
-  console.log(positionId);
+
   useEffect(() => {
     const getDepartment = async () => {
       setLoading(true);
@@ -52,7 +50,6 @@ export default function PositionEdit({ productionId, companyId, positionId }) {
         let supId = "";
         let depId = "";
         await getDoc(docRef).then((res) => {
-          console.log(res.data());
           setPositionData({
             name: res.data().name,
           });
@@ -72,7 +69,7 @@ export default function PositionEdit({ productionId, companyId, positionId }) {
         querySnapshot.forEach((doc) => {
           arr2.push(doc.id);
         });
-        console.log("supId" + supId);
+
         setAllPos(arr2);
         if (supId !== "") {
           //get supervisor
@@ -81,7 +78,7 @@ export default function PositionEdit({ productionId, companyId, positionId }) {
           await getDoc(posRef).then((doc) => {
             arr = [{ name: doc.data().name, id: doc.id }];
           });
-          console.log(arr);
+
           setSupervisor(arr);
         }
       } catch (err) {

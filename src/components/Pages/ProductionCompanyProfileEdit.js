@@ -53,7 +53,7 @@ export default function ProductionCompanyProfileEdit({ companyId }) {
   useEffect(() => {
     const getProductionCompany = async () => {
       setLoading(true);
-      console.log(companyId);
+
       try {
         const docRef = doc(db, "productioncompany", companyId);
         await getDoc(docRef).then((res) => {
@@ -145,7 +145,6 @@ export default function ProductionCompanyProfileEdit({ companyId }) {
     } else {
       setSearchable(true);
     }
-    console.log(searchable);
   };
 
   const handleBack = () => {

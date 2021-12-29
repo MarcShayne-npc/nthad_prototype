@@ -129,7 +129,6 @@ export default function ProductionOffer({
           let id = "";
           snap.forEach((res) => {
             id = res.id;
-            console.log(res.id);
           });
           setUserPositionId({
             id: id,
@@ -197,9 +196,6 @@ export default function ProductionOffer({
   };
 
   const handlePosition = () => {
-    console.log(positionId);
-    console.log(productionId);
-    console.log(company);
     setProductionId(productionId);
     setPositionId(positionId);
     setProductionCompany(company);

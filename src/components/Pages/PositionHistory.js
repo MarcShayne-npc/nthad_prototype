@@ -121,7 +121,7 @@ export default function PositionHistory({
             arrUser.push(doc.data().userid);
           }
         });
-        console.log(arr);
+
         let arr2 = [];
         const querySnapshot2 = await getDocs(userRef);
         querySnapshot2.forEach((doc) => {
@@ -129,7 +129,7 @@ export default function PositionHistory({
             arr2.push({ docid: doc.id, data: doc.data() });
           }
         });
-        console.log(arr2);
+
         let arr3 = [];
         //sort and set data
         let i = 0;
@@ -162,7 +162,7 @@ export default function PositionHistory({
         });
 
         setData(arr3);
-        console.log(arr3);
+
         setLoading(false);
       } catch (err) {
         console.log(err);

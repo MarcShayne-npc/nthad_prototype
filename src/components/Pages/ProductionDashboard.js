@@ -99,7 +99,7 @@ export default function ProductionDashboard({
             removed++;
           }
         });
-        console.log(active);
+
         setCrewCount({
           Position: position - removed,
           Filled: active + completed,

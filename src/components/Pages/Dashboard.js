@@ -110,7 +110,7 @@ export default function Dashboard({
           collection(db, "user", currentUser.uid, "userposition"),
           where("positionid", "==", positionId)
         );
-        console.log(positionId);
+
         let id = "";
         const querySnap = await getDocs(userPosRef);
         querySnap.forEach((doc) => {

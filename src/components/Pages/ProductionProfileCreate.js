@@ -104,7 +104,7 @@ export default function ProductionProfileCreate({ companyId }) {
 
   const handleAuto = (e) => {
     let x = e.target.value;
-    console.log(x.length);
+
     if (x.length <= 15) {
       autoRef.current.value = e.target.value;
     }

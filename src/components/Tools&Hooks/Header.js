@@ -97,7 +97,7 @@ const SmallAvatar = styled(Avatar)(({ theme }) => ({
   cursor: "pointer",
 }));
 
-export default function Header() {
+export default function Header({ productionId }) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [error, setError] = useState();
@@ -105,6 +105,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   const handleDrawerOpen = () => {
+    console.log(productionId);
     setOpen(true);
   };
 
@@ -192,7 +193,13 @@ export default function Header() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+  const handleDashboard = () => {
+    setAnchorEl(null);
+  };
+  const handleDepartmentPage = () => {
+    navigate("/department-page");
+    setAnchorEl(null);
+  };
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -237,11 +244,11 @@ export default function Header() {
                 horizontal: "left",
               }}
             >
-              <MenuItem onClick={handleClose}>
+              <MenuItem onClick={handleDashboard}>
                 <DashboardIcon />
                 Dashboard
               </MenuItem>
-              <MenuItem onClick={handleClose}>
+              <MenuItem onClick={handleDepartmentPage}>
                 <CorporateFareIcon /> Department Page
               </MenuItem>
               <MenuItem onClick={handleClose}>

@@ -50,7 +50,11 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route exact path="/" element={<PrivateRoute />}>
+            <Route
+              exact
+              path="/"
+              element={<PrivateRoute productionId={productionId} />}
+            >
               <Route
                 path="/production-list"
                 exact

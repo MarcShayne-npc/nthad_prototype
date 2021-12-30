@@ -38,7 +38,7 @@ export default function UserPositionHistory() {
     },
     {
       field: "positionName",
-      headerName: "PositionName",
+      headerName: "Position",
       width: 150,
     },
     {
